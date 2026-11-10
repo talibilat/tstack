@@ -1,6 +1,6 @@
 ---
 name: blueprint
-description: The first skill of the pipeline. Turns a Jira ticket, the problem already in this chat, or a plain request into a researched and checked plan with before proof, then hands off to ship. Use when the user types blueprint, asks to pick, grab or plan a ticket, or wants a plan for the problem discussed above. "just blueprint" stops after the plan.
+description: The first skill of the pipeline. Turns a Jira ticket, the problem already in this chat, or a plain request into a researched and checked plan with before proof, then hands off to ship. A bug gets no plan until it has been reproduced. Use when the user types blueprint, asks to pick, grab or plan a ticket, or wants a plan for the problem discussed above. "just blueprint" stops after the plan.
 ---
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
@@ -8,6 +8,8 @@ Never assume a requirement. Check Jira for the latest requirements before acting
 # blueprint
 
 Understand the task, prove the problem, research it, and write a plan that no builder can misread. Change no code except the failing repro test.
+
+**A bug is never planned before it has been reproduced.** If it will not reproduce, the work stops at step 5 with a short report of why and how to get unblocked.
 
 First read `~/.agents/skills/blueprint/references/conventions.md`. It holds the pipeline order, the Jira ids, repos, naming, the progress board, the evidence folders, the agent rules and the ask-first list. The user's message outranks everything here (see "Your message comes first" in that file). If you are not Claude Code inside T3, read its "Using these skills from another agent" table and swap the tools as it says.
 
@@ -61,15 +63,28 @@ Done when the ticket file exists and every requirement you know of has a named s
 
 Done when each repo has a worktree and a baseline row.
 
-## 5. Reproduce and capture the before proof
+## 5. Reproduce first (a hard gate)
 
-Call the `reproduce` skill when the task is a bug, or when the ticket or the chat shows an error or steps to reproduce. It checks the history, reproduces the problem step by step on the current default branch, saves the before screenshots and logs, and returns the root cause. Pass it the key and any earlier work found in step 2.
+Run the `reproduce` skill when the task is a bug, or when the ticket or the chat shows an error or steps to reproduce. It checks the history, reproduces the problem live, step by step, on the current default branch, saves the before screenshots and logs, and returns one of three results in the first line of `.scratch/<KEY>-repro.md`:
 
-For a feature or change with a visible screen, there is no bug to reproduce. Capture before screenshots of the current screen with `lane` (or the browser tools) into `.scratch/<KEY>-evidence/before/` and write the steps to `.scratch/<KEY>-repro.md`, so the after screenshots can be taken the same way.
+| Result | What you do |
+|---|---|
+| `Reproduced: yes` | Carry on to step 6 with the root cause and the before proof. |
+| `Reproduced: no` | Stop. See below. |
+| `Reproduced: already fixed` | Stop. See below. The current code no longer shows the bug and the history names the change that fixed it. |
 
-Skip this step only for work with nothing to run, and write the reason on the board.
+On `no` or `already fixed`, start no research agents and write no decision log and no plan:
 
-Done when `<KEY>-repro.md` lists the exact steps and `before/` holds a proof file for each step, or the skip reason is recorded.
+1. Post the "Could not reproduce" report from `reproduce` step 4 in chat. It is short: what was tried, why it did not reproduce, and how we can get it to reproduce.
+2. Offer a draft Jira comment for the reporter. Post it only after the user says yes.
+3. Show the "Could not reproduce" card from the cards file, write `pause`, and wait. The claim and the worktrees stay.
+4. When the user brings the missing detail, run `reproduce` again from its step 1. Planning starts only when it says `Reproduced: yes`.
+
+The user can lift this gate only by saying so in the call ("plan without reproducing it"). Note in one line that you set the rule aside, and mark the plan "not reproduced" at the top.
+
+For a feature or change with a visible screen, there is no bug to reproduce. Capture before screenshots of the current screen with `lane` (or the browser tools) into `.scratch/<KEY>-evidence/before/` and write the steps to `.scratch/<KEY>-repro.md` with `Reproduced: not a bug`, so the after screenshots can be taken the same way. Work with nothing to run (a docs or config text change) skips this step. Write the reason on the board. This skip never applies to a bug.
+
+Done when `<KEY>-repro.md` says `Reproduced: yes` (or `not a bug`) and `before/` holds a proof file for each step, or the could-not-reproduce report has been shown and the work has stopped.
 
 ## 6. Research with sub-agents
 
@@ -129,5 +144,6 @@ Then hand off:
 - Never offer or take a ticket assigned to someone else.
 - Never write a requirement that has no BA source.
 - Never write the plan before the research agents have returned.
+- Never research, decide or plan a bug that has not reproduced. Stop and report why instead.
 - Never push in this skill.
 - Never rename the chat to anything but the ticket key.

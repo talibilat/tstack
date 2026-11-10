@@ -39,4 +39,4 @@ Label: `PROJ-123 (Bug, High, 2h)`. Description: the ticket summary. "Other" take
 
 - **Nothing matches.** Show the count per filter. Ask once: widen the filters, or include unassigned tickets. Never include unassigned tickets without this answer.
 - **Repos unclear.** No repo clearly fits the ticket. Multi-select, best guess first and marked "(Recommended)".
-- **Repro stuck.** After 30 minutes or 3 failed approaches. Options: "Keep trying for 30 more minutes", "Move ticket back to To Do and stop", "Post a Jira comment asking for repro details".
+- **Could not reproduce.** Shown with the report from `reproduce` step 4, when the bug did not reproduce or is already fixed. No plan is written until it reproduces. Options: "I will give you the missing detail", "Draft a Jira comment asking the reporter" (posted only after the user approves the text), "Try again a different way" (the user says how in Other), "Move the ticket back to To Do and stop". For an already-fixed bug, the third option becomes "Draft the Jira comment saying it is already fixed".

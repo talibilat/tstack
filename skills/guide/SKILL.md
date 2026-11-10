@@ -22,7 +22,8 @@ Pick the branch that fits what the user asked. A bare `guide` in a chat with wor
 | Nothing, empty chat | The start | `full send PROJ-123` to do everything in one go. Or `blueprint`, `blueprint PROJ-123`, or `blueprint` followed by the problem in your own words |
 | A problem or error in the chat, no files | The start, with the task already described | `blueprint` (it takes the problem above as the task) |
 | `-ticket.md`, no `-repro.md`, and it is a bug | `blueprint` before the reproduce step | `blueprint <KEY>` to resume |
-| `-repro.md` and `before/` proof, no `-plan.md` | `blueprint` research and planning | `blueprint <KEY>` to resume |
+| `-repro.md` says `Reproduced: no` or `already fixed` | Stopped at the reproduce gate, no plan on purpose | Read the could-not-reproduce report, give the missing detail, then `blueprint <KEY>` |
+| `-repro.md` says `Reproduced: yes` and `before/` proof, no `-plan.md` | `blueprint` research and planning | `blueprint <KEY>` to resume |
 | `-plan.md`, no build commits in the worktree | Planned, ready to build | `ship <KEY>` |
 | Build commits, no `-reviews.md` | Built, not checked | `ship <KEY>` (it calls `inspect`) |
 | `-reviews.md` below 100, or a live run FAIL | In the fix loop | `ship <KEY>` to run the next round |
@@ -42,7 +43,7 @@ Show this table, then one line on how the stages follow each other. The order an
 |---|---|---|---|
 | `full-send` | You want the whole job done while you are away | `full send PROJ-123`, or `full send` under a problem in the chat | Every stage below in order, with no questions, and the chat stays on the PR until it is merged |
 | `blueprint` | Always first. A new ticket, a bug, an error in the chat, or any request | `blueprint` alone in an empty chat asks 1 to 4 short questions (random or specific ticket, then priority, epic, ticket). `blueprint PROJ-123` asks nothing. `blueprint` under a problem in the chat plans that problem. `just blueprint` stops after the plan | A claimed ticket, a worktree, before proof, research from many sub-agents, a decision log backed by BA words, a checked plan with a checklist |
-| `reproduce` | `blueprint` calls it for every bug. Type it yourself to reproduce a bug or check one that came back | `reproduce PROJ-123` | Step by step repro on the current code, before screenshots and logs, a failing test, the root cause, and the history when it is a repeat |
+| `reproduce` | `blueprint` calls it for every bug. Type it yourself to reproduce a bug or check one that came back | `reproduce PROJ-123` | Step by step repro on the current code, before screenshots and logs, a failing test, the root cause, and the history when it is a repeat. When it will not reproduce, a short report of why and how to get unblocked, and no plan |
 | `ship` | After the plan. `blueprint` starts it by itself | `ship PROJ-123`. With no plan it runs `blueprint` first. adding "build only" builds without QA or a PR | Parallel builders in one worktree, the `inspect` loop until the score is 100, after proof, a PR and a Jira comment with before and after screenshots, then the PR watch until merge |
 | `inspect` | `ship` calls it after the build. Type it yourself to check any ticket, branch or PR | `inspect PROJ-123` | Four code reviewers, a live run, every acceptance criterion checked, a score out of 100 and a verdict |
 | `lane` | Whenever the app must run for real: before proof, live run, after proof. The other skills call it | `lane`, or let the pipeline call it | A private copy of Aruva per agent, UI screenshots, API transcripts and logs |

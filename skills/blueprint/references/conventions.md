@@ -16,6 +16,8 @@ Shared by `blueprint`, `reproduce`, `ship`, `inspect` and `lane`. Read it once p
 
 `full-send` runs all six stages in one go and keeps the chat open until the PR is merged. Side skills: `council` (three models review a plan or a change), `modernize` (bring an old PR up to date), `explain-jira` and `explain-pr` (explain Jira and GitHub comments in simple words).
 
+A bug is never planned before it has been reproduced. `blueprint` stops at its reproduce step when `reproduce` says `Reproduced: no` or `already fixed`.
+
 Each skill starts the next one without asking. "just blueprint" stops after the plan. "build only" stops after the build. "just inspect" checks and reports without fixing.
 
 ## Writing
@@ -55,7 +57,7 @@ Autopilot stops, and asks or reports, in only these cases:
 - the ticket is assigned to someone else, or another chat is working on it
 - a setup value is missing and no tool can supply it
 - an Ask first item that the user did not name in the call
-- the bug will not reproduce after the timebox
+- the bug will not reproduce, or is already fixed (blueprint writes no plan, shows the could-not-reproduce report and waits)
 - the live test needs the user to run it
 - the QA verdict is Needs BA input
 - the overrun flag, or a review loop that is stuck or fails its fifth round
