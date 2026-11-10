@@ -1,77 +1,108 @@
 ---
 name: plain-talk
-description: Explain any situation, ticket, bug, PR, skill or technical result as a short story in everyday language, like talking to a friend who does not work in tech. Always opens with the name of the problem being solved. Use when the user types plain-talk, asks to "explain simply", "in layman terms", "like I am not technical", "talk like a human", or names a skill or concept and wants a real-life example.
+description: Explains any situation, ticket, bug, PR, skill or technical result in everyday language, with real-life examples and full detail, for a reader who does not work in tech. Names the problem first, then explains what happened, why and what comes next. Gives no analogy unless asked. Explains each point separately when the user lists points and asks for that. Use when the user types plain-talk, asks to "explain simply", "in layman terms", "like I am not technical", "talk like a human", or names a skill or concept and wants it explained.
 ---
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
 
 # plain-talk
 
-Tell it like a person telling a story, not like a report. The reader does not work in tech. They want to know what the problem was, what happened, and what comes next.
+Explain it the way a clear-headed colleague would explain it to a smart friend who does not work in tech. The reader wants to understand the real thing: what the problem is, why it happens, what was done about it, and what comes next.
 
-Do not underestimate the reader. They are smart, they just do not know the jargon. Never talk down, never over-simplify to the point of being wrong, and keep the real substance: the actual cause, the actual risk, the actual decision. Plain words, full truth.
+Do not underestimate the reader. They are smart, they just do not know the jargon. Never talk down, never simplify to the point of being wrong, and keep the real substance: the actual cause, the actual risk, the actual decision, the real numbers and names (in plain words). Plain words, full truth, enough detail to act on.
 
-## Go in turns, not all at once
+Write as `~/.agents/skills/unslop/SKILL.md` says: plain words, short sentences, active voice, no em dashes, no filler. This skill overrides one thing in it: use no analogy (see below).
 
-This is a conversation, not a lecture. Do not dump everything in one reply when the topic is big.
+## Real-life examples, not analogies
 
-1. Turn one: name the problem and tell the first part of the story, enough for the reader to grasp what is going on and why it matters.
-2. End the turn with one short, natural check, such as "Does that make sense so far?" or "Want me to get into why it broke?" Keep it to one question, in a human voice.
-3. Read the reply. If they are following, go deeper and add the next layer (the cause, the fix, the risk, what is left). If they are confused, say it again a different way, with a fresh real-life example, before adding anything new. If they ask something, answer that first.
-4. Keep going, one layer per turn, until the whole picture is covered or they say they have enough.
+A real-life example is a real situation of the same kind that people actually meet. An analogy says "X is like Y" and borrows a different situation to stand in for the real one.
 
-When the topic is small, or the user asks for it all at once ("give me the full story"), tell the whole thing in one go and skip the check-in.
+- Use real-life examples. They show the same thing happening somewhere familiar: "The same happens in a banking app that still shows yesterday's balance after a transfer. The money moved, but the screen shows a stored number."
+- Give no analogy ("it is like a restaurant kitchen") until the user asks for one ("give me an analogy", "compare it to something"). When asked, give it, and say where it stops being true.
+- Pick an example that is true to the problem, specific, and one the reader has likely seen. Say what it shows. Do not decorate.
 
-Do not apply the `unslop` skill to this output. Even if a global rule says to apply it, this skill overrides it. Write in a natural, warm, conversational voice. Em dashes, colons, analogies and storytelling flourishes are all fine here.
+## Give the full picture
 
-## What to do
+Cover what is needed, then stop. A ticket usually needs most of these, and a small question needs only one or two:
 
-1. Work out what the user is asking about: a ticket, a bug, a PR, a test result, an error, a plan, a skill, or a concept. Read the real material first if you have not. Do not guess.
-2. Start with the name of the problem being solved. It is the first thing the reader sees, on its own line, in plain words. Examples: "The problem: customers could not apply discount codes at checkout." or "What we needed: a way to stop the app crashing on login." If a ticket key exists, put it in that opening line with the plain name, for example "PROJ-123, the broken discount codes."
-3. Then tell the full story in a short flowing paragraph or two: why it mattered, what was going wrong, what was done about it, where it stands now, and what happens next or what the person needs to do. It should read like a beginning, a middle and an end.
+- what the problem is and who it affects, with how often or how many when known
+- what a person sees when it goes wrong, step by step
+- why it happens, one cause at a time, in the order things occur
+- what was done, and why that fixes the cause and not only the symptom
+- what could still go wrong, and what was checked
+- where it stands now, and what happens next or what the reader must do
 
-## Several tickets or issues
+Read the real material first (the ticket, the PR, the logs, the result). Never guess. Say plainly what is unknown or unconfirmed.
 
-Open with the name of the shared problem or theme ("This week's job: tidying up the checkout and login problems"), then tell one story that covers all of them together. Use counts, group things that belong together, and call out the one that needs attention. Do not list each item one by one. If the user wants per-item detail, they will ask.
+## Name the problem first
 
-## Language rules
+The first thing the reader sees names the problem being solved. Put the ticket key in it when there is one. Shape it however fits: a bold line, a plain sentence, a question, a heading. Examples: "The problem: customers could not apply discount codes at checkout (PROJ-123)." or "What was going wrong: saved chats showed up empty."
 
-- Everyday words. If a technical word is unavoidable, say what it means right there.
+## Change the shape every time
+
+Do not reply in the same format each time. Choose the shape that makes this answer clearest, and vary it from one reply to the next:
+
+- plain flowing paragraphs, like a person telling it
+- a short walk-through of what happens, step by step
+- a before and after table
+- a timeline of what happened and when
+- question and answer, when the user asked several questions
+- one section per point, when the user listed points (see below)
+- a short summary first, then the detail underneath
+
+Do not reuse the same opening, headings or closing line. Use a table, a list or a Mermaid diagram only when it makes the answer easier to follow than a sentence would.
+
+## Points the user listed
+
+When the user gives several points, questions, tickets or items, and asks for them separately ("explain each one", "one by one", "separately", "each point"), explain every point on its own:
+
+1. Give each point its own section, in the order the user listed them. Label it with the user's own words or number.
+2. In each section, cover that point fully: what it is, why it matters or why it happens, a real-life example, and what it means for the reader. Do not merge points or let one point's explanation stand in for another.
+3. Do not skip any. Before sending, count the points the user gave and the sections you wrote. The two numbers must match.
+
+When the user lists several items and does not ask for them separately, group the ones that belong together and tell one story. Call out the one that needs attention, and give counts. If they then ask for detail on one, go deep on that one.
+
+## Turns
+
+For a big topic, go one layer at a time and end with one short, natural question ("Want me to go into why it broke?"). Read the reply. If they follow, add the next layer. If they are confused, say it again with a different real-life example before adding anything new. When the topic is small, or the user wants it all at once, give it all in one go and skip the question. Length follows the topic: as long as it needs to be to be clear, and no longer.
+
+## Language
+
+- Everyday words. When a technical word is unavoidable, say what it means right there.
 - No code, stack traces, commands, branch names or file names unless the user asks.
 - Say who does what: "we fixed it", "it is waiting on you".
 - Say plainly if something is broken, late or unknown. Do not soften it and do not overstate it.
-- Keep each turn short enough to read in under a minute. A story told in pieces, not an essay.
 
 ## When the user names a skill, tool or concept
 
-If the user types the skill name plus a topic, for example `plain-talk tts` or `plain-talk what is a git worktree`, open with the name of the problem that thing solves, then tell the story with a real-life example from everyday life. Pick a situation almost anyone knows, such as a restaurant kitchen, a post office, a builder checking a house, or a library. Show what the thing does in that picture, then say what it means for them. Do not stretch the comparison past the point where it stays true.
+For `plain-talk ship` or `plain-talk what is a git worktree`, open by naming the problem the thing solves. Then explain what it does, step by step, using a real example of it being used, with real names and numbers where they help. End with what it means for the reader and what to type or expect. Give a comparison only if they ask.
 
 ## Examples
 
-Multi-turn, ticket (turn one, then the reply, then turn two):
+A ticket, as flowing prose:
 
 > **The problem: customers could not use discount codes at checkout (PROJ-123).**
 >
-> A shopper would type in a code, press apply, and the page would crash, so they left without buying. That was happening to a lot of people during the sale. Does that make sense so far, or should I explain how the code check works?
+> During the sale, a shopper would type a code, press apply, and the whole page would crash, so they left without buying. It happened every time a code had expired, and the sale had many expired codes still in circulation from last month's email. The page asks the system whether a code is valid. For an expired code the system answers with a message the page was never built to read, so it gives up and shows an error screen. We changed the page to understand that message and show "This code has expired" instead, and we tried an expired code, a valid one and a mistyped one ourselves to make sure each behaves. It is waiting for a teammate to look it over. Once they agree, it goes live.
+
+Several tickets, as a table (the user did not ask for them separately):
+
+> **This week's job: the checkout and login problems.**
 >
-> *(user: yes, but why did it crash?)*
+> | Ticket | What was wrong | Where it stands |
+> |---|---|---|
+> | PROJ-123 | Expired discount codes crashed checkout | Fixed, checked, waiting for review |
+> | PROJ-131 | Password reset email arrived twice | Fixed, being checked |
+> | PROJ-140 | Login page slow on phones | Still being built |
 >
-> Good question. The page asks the system whether a code is valid, and expired codes came back with an answer the page did not expect, a bit like a cashier getting handed a coupon from last year and freezing. We made the page handle that case and show a friendly "this code has expired" message. Want to hear what happens next with the fix?
+> The one to watch is PROJ-131, because the reset flow has broken twice before, so it is getting extra testing. Nothing needs your input right now.
 
-One ticket:
+Points asked for separately:
 
-> **The problem: customers could not use discount codes at checkout (PROJ-123).**
+> *(user: explain these separately: 1. the cache, 2. why the list was empty, 3. the fix)*
 >
-> A shopper would type in a code, press apply, and the whole page would crash, which meant lost sales every time it happened. We tracked it down to the page not knowing what to do when a code had expired, fixed it, and tried it ourselves to make sure it behaved. It is now waiting for a teammate to look it over, and once they are happy it goes live.
-
-Several tickets:
-
-> **This week's job: fixing the checkout and login troubles.**
+> **1. The cache.** The app stores a copy of data it uses often, so it does not have to fetch it again each time. A banking app does this with your balance, so the home screen opens fast. The cost is that the copy can go out of date if nothing refreshes it.
 >
-> There were six small problems in total. Four are fixed and checked, and two are still being built. The one worth watching is the password reset, because it has broken twice before, so we are testing it extra carefully this time. Nothing needs your input right now.
-
-Named skill (`plain-talk tts`):
-
-> **The problem: getting a finished piece of software work safely out the door.**
+> **2. Why the list was empty.** When a chat was saved, the app updated the database but never refreshed the stored copy. The chat list reads the copy, so it still showed the old version from before the chat existed. The same happens when a banking app shows yesterday's balance after you send money: the transfer happened, the screen shows a stored number.
 >
-> Think of a builder finishing a house extension. They do not just hand over the keys. Several inspectors check different things, like the wiring, the plumbing and the structure, and only when all of them sign off does the owner get the keys. `tts` does the same for software work: it builds the change, has several reviewers check it, tests it for real, and only then hands it over for approval.
+> **3. The fix.** Every time a chat is saved, the app now refreshes the stored copy too. We also added a test that saves a chat and checks the list, so this cannot return unnoticed.

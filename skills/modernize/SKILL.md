@@ -52,4 +52,4 @@ Age alone is no reason to close, and effort already spent is no reason to keep.
 
 Lead with the verdict and the reason. Then: what changed on the default branch that matters, any conflict of ideas (or that there was none), the rebase and push result, the checks you ran, and what is left to decide, with the PR link. Keep what you saw apart from what you judge, and say what you could not check.
 
-Hand over to `babysit-pr` when the user wants the PR taken to merge.
+Hand over to `babysit` when the user wants the PR taken to merge.
