@@ -69,13 +69,21 @@ Run the `reproduce` skill when the task is a bug, or when the ticket or the chat
 
 | Result | What you do |
 |---|---|
-| `Reproduced: yes` | Carry on to step 6 with the root cause and the before proof. |
+| `Reproduced: yes` | Run the before gate below. Carry on to step 6 only when it passes. |
 | `Reproduced: no` | Stop. See below. |
 | `Reproduced: already fixed` | Stop. See below. The current code no longer shows the bug and the history names the change that fixed it. |
 
-On `no` or `already fixed`, start no research agents and write no decision log and no plan:
+The before gate is mechanical, so run it and paste its last line in chat:
 
-1. Post the "Could not reproduce" report from `reproduce` step 4 in chat. It is short: what was tried, why it did not reproduce, and how we can get it to reproduce.
+```
+python3 -I ~/.agents/skills/blueprint/scripts/proof.py gate before <KEY>
+```
+
+It must print `before gate: PASS`. Any FAIL line (no live environment, a script method with no reason, a missing screenshot, no logs) means you do not move on. Fix what it names first.
+
+On `no` or `already fixed`, `reproduce` has already tried to clear the blocker itself (3 rounds). Start no research agents and write no decision log and no plan:
+
+1. Post the "Could not reproduce" report from `reproduce` step 4 in chat. It is short: what was tried, what is blocking it, and how we resolve it.
 2. Offer a draft Jira comment for the reporter. Post it only after the user says yes.
 3. Show the "Could not reproduce" card from the cards file, write `pause`, and wait. The claim and the worktrees stay.
 4. When the user brings the missing detail, run `reproduce` again from its step 1. Planning starts only when it says `Reproduced: yes`.
@@ -84,7 +92,7 @@ The user can lift this gate only by saying so in the call ("plan without reprodu
 
 For a feature or change with a visible screen, there is no bug to reproduce. Capture before screenshots of the current screen with `lane` (or the browser tools) into `.scratch/<KEY>-evidence/before/` and write the steps to `.scratch/<KEY>-repro.md` with `Reproduced: not a bug`, so the after screenshots can be taken the same way. Work with nothing to run (a docs or config text change) skips this step. Write the reason on the board. This skip never applies to a bug.
 
-Done when `<KEY>-repro.md` says `Reproduced: yes` (or `not a bug`) and `before/` holds a proof file for each step, or the could-not-reproduce report has been shown and the work has stopped.
+Done when `gate before` prints PASS, or the could-not-reproduce report has been shown and the work has stopped.
 
 ## 6. Research with sub-agents
 
@@ -145,5 +153,6 @@ Then hand off:
 - Never write a requirement that has no BA source.
 - Never write the plan before the research agents have returned.
 - Never research, decide or plan a bug that has not reproduced. Stop and report why instead.
+- Never skip the before proof. It is skipped only when the user says "skip proof" in the call (see Proof in the conventions file).
 - Never push in this skill.
 - Never rename the chat to anything but the ticket key.

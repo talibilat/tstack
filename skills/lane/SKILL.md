@@ -7,6 +7,8 @@ description: Gives each agent its own small, isolated copy of Aruva (a lane) bui
 
 A **lane** is one agent's private Aruva: its own database, Redis, Qdrant, Neo4j, backend, AI service and frontend, on its own ports. The heavy stateless services (document parser, content extractor, PII masking) are shared from the always-on base stack. Many agents can each hold a lane at once without touching each other's data, ports or containers.
 
+The browser that `lane shot` and the flows open is real Google Chrome with a visible window. Set `HEADLESS=1` only when there is no other option, and write the reason on the `Method:` line of the repro file.
+
 Everything goes through one command, `lane`, in this skill's `scripts/` folder. Below, `lane` means `~/.agents/skills/lane/scripts/lane`.
 
 The pipeline uses a lane three times, and each use follows the steps below:

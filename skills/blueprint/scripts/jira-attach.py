@@ -55,11 +55,12 @@ def call(cfg, path, data=None, headers=None):
         sys.exit(f"could not reach Jira: {err.reason}")
 
 
-def attach(cfg, key, file_path):
+def attach(cfg, key, file_path, name=None):
+    name = name or file_path.name
     boundary = uuid.uuid4().hex
     kind = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
     body = (
-        f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="{file_path.name}"\r\n'
+        f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="{name}"\r\n'
         f"Content-Type: {kind}\r\n\r\n"
     ).encode() + file_path.read_bytes() + f"\r\n--{boundary}--\r\n".encode()
     result = call(

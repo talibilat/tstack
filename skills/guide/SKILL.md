@@ -31,6 +31,7 @@ Pick the branch that fits what the user asked. A bare `guide` in a chat with wor
 | PR open | The PR watch | `babysit <PR link>`, or "check the PR" |
 | An old PR that fell behind | Needs a decision | `modernize <PR link>` |
 | Comments you do not follow | Needs explaining | `explain-jira <Jira link>` or `explain-pr <PR link>` |
+| `proof.py` prints FAIL | A proof gate is stopping the work on purpose | Fix the line it names. Never skip it. Only you can, by saying "skip proof" |
 | A card or question waiting | Blocked on the user | Answer the question shown |
 
 Done when the user knows the stage and has one thing to type.

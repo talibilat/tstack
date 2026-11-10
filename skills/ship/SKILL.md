@@ -82,18 +82,31 @@ Round limits, the stuck rule and the diagnosis are in the same file. "Needs BA i
 
 Done when all four conditions hold on one commit.
 
-## 5. After proof with lane
+## 5. After proof, and the comparison
 
-Run this on the final commit, after the loop ends.
+Run this on the final commit, after the loop ends. The before proof from `reproduce` is the other half of the comparison, so keep it untouched.
 
-1. Sync every repo with dev (`~/.agents/skills/lane/scripts/sync-dev.sh <worktree> ...`). If a worktree moved, rebuild the lane and run the baseline again. Then follow `<KEY>-repro.md` exactly as `reproduce` did, in the same place and with the same account and data. For Aruva use the `lane` skill.
-2. Save a proof file for every step into `.scratch/<KEY>-evidence/after/`, with the same file names as in `before/`. UI screenshots wherever the before proof is a UI screenshot. Save the logs for the same action, now clean.
-3. Write `.scratch/<KEY>-evidence/before-after.md`: one row per step with the before image, the after image and a one-line caption.
+1. Sync every repo with dev (`~/.agents/skills/lane/scripts/sync-dev.sh <worktree> ...`). If a worktree moved, rebuild the lane and run the baseline again.
+2. Follow `<KEY>-repro.md` exactly as `reproduce` did: same place, same account and data, same method (visible Chrome on the lane, as the `Method:` line says). For Aruva use the `lane` skill.
+3. Save a proof file for every step into `.scratch/<KEY>-evidence/after/`, with the same file names as in `before/`, and the logs for the same action, now clean.
 4. Close every window and tab you opened, and give the lane back.
+5. Run the after gate. It also re-checks the before side, and rejects an after image that is identical to its before image:
+
+   ```
+   python3 -I ~/.agents/skills/blueprint/scripts/proof.py gate after <KEY>
+   ```
+
+6. Build the comparison. It makes one image per step, with the before and after side by side under red BEFORE and green AFTER labels, and a `compare/compare.md` table:
+
+   ```
+   python3 -I ~/.agents/skills/blueprint/scripts/proof.py compare <KEY>
+   ```
+
+7. Open each comparison image and look at it. Check that it shows the same screen, that the bug is visible on the left and gone on the right, and that it is readable. If not, retake the screenshot, or crop the originals (keep the uncropped ones under `originals/`) and run `compare` again.
 
 The after shots `inspect` saved during its live run count, when they were taken on this same commit and cover every step.
 
-Done when every file in `before/` has a file of the same name in `after/`, and the table shows them side by side.
+Done when `gate after` prints `after gate: PASS` and every comparison image has been looked at.
 
 ## 6. Close out
 
@@ -106,7 +119,7 @@ Follow `references/closeout.md`. It ends only when the PR is merged. In order: p
 - Never edit outside the plan's files without a written reason.
 - Never run a bigger model without a card.
 - Never call the work done below 100, or without a live run PASS on the current commit.
-- Never open a PR or update Jira without before and after proof.
+- Never open a PR or update Jira without the before and after comparison. Only the user can waive it, by saying "skip proof" in the call.
 - Never merge the PR yourself.
 - Never poll an agent. Watch PRs only the way `babysit` says.
 - Never end the chat's work before the PR is merged, unless the user stopped it.

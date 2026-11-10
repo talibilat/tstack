@@ -256,6 +256,24 @@ It fetches `origin`, and rebases a clean worktree onto the latest default branch
 - Write the commits the copy was built from on the `Live environment` line of `<KEY>-repro.md` and in the live test file.
 - The shared base stack (`qa-dev`) holds the parser, extractor and PII masking that lanes borrow. If it runs older images than dev, say so. Never stop or recreate it without asking.
 
+## Proof is mandatory
+
+The before and after comparison is the main proof that a bug is fixed. It cannot be skipped. Only the user can waive it, by saying "skip proof" (or the same in clear words) in the call. When they do, write their words to `.scratch/<KEY>-evidence/SKIPPED-BY-USER.txt`, and say "Proof skipped at the user's request" in the PR and the Jira comment.
+
+The path, with a mechanical check at each point (`python3 -I ~/.agents/skills/blueprint/scripts/proof.py`, called `proof.py` below):
+
+| When | What | Check |
+|---|---|---|
+| The bug happens | `reproduce` saves the before screenshots and logs into `before/` | `proof.py gate before <KEY>` prints PASS. Planning cannot start without it |
+| The bug is fixed | `ship` saves the after screenshots and logs into `after/`, same steps, same file names | `proof.py gate after <KEY>` prints PASS |
+| After it passes | `proof.py compare <KEY>` joins each pair into one side-by-side image in `compare/` (red BEFORE, green AFTER). Look at each one and retake or crop if it is unclear | The images are readable |
+| Before the PR | The comparison images go to the evidence branch and into the PR description | |
+| After the PR opens | `proof.py attach <KEY>` puts the comparison images and logs on the Jira ticket | `proof.py verify <KEY> --pr <org/repo#n>` prints PASS. The ticket cannot move to Code Review before it |
+
+Where it is kept: `.scratch/<KEY>-evidence/` (`before/`, `after/`, `compare/`). The before proof is never overwritten. It stays until the PR is merged, then is archived with the worktree.
+
+How the proof is taken: with the app running in Docker (a `lane` for Aruva) and driven in real Google Chrome on this computer, in a visible window, step by step. A background or headless script is allowed only when there is no other option, and the reason goes on the `Method:` line of the repro file.
+
 ## Evidence
 
 Proof lives in `.scratch/<KEY>-evidence/`:
@@ -265,8 +283,8 @@ Proof lives in `.scratch/<KEY>-evidence/`:
 | `before/NN-<what>.png` | The problem, or the old screen, one file per step of `<KEY>-repro.md` | `reproduce`, or `blueprint` for a change that is not a bug |
 | `before/*.txt` | Logs, console output and the failed request for the same action | the same |
 | `after/NN-<what>.png` | The same steps on the final commit, under the same file names | `inspect` live run, or `ship` step 5 |
+| `compare/NN-<what>.png` and `compare/compare.md` | One side-by-side image per step, built by `proof.py compare` | `ship` step 5 |
 | `after/*.txt` | The same logs, now clean | the same |
-| `before-after.md` | A table with one row per step: before image, after image, caption | `ship` step 5 |
 | other `NN-<what>` files | Proof for the other live run steps | `inspect` |
 
 Rules:
@@ -274,7 +292,7 @@ Rules:
 - Before and after are taken the same way: same steps, same place, same account and data.
 - UI screenshots are required when the change shows in the UI, or when the ticket itself carries UI screenshots. A terminal screenshot or transcript is welcome as extra proof and never replaces a UI screenshot.
 - Save the logs with the screenshots.
-- The PR and the Jira ticket both get the before and after table.
+- The PR description shows the comparison images, and the Jira ticket has them attached. `proof.py verify` checks both.
 - Close every browser window and tab after use (`t3_preview_close` in T3), and give lanes back.
 - Strip secrets, tokens, emails and personal data before a file leaves the machine.
 

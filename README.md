@@ -121,7 +121,8 @@ Every skill stops and asks before these: a force-push or history rewrite, a data
 
 - Requirements come only from words the BA wrote in Jira. Every decision is logged with its source.
 - Nothing passes without a live run. UI changes are proven with UI screenshots.
-- The PR and the Jira ticket both carry before and after screenshots, taken with the same steps.
+- A bug is reproduced first, in Docker or a lane, in a visible Chrome window. If it will not reproduce, the agent works on the blocker for up to 3 rounds, then reports it and stops. No plan is made.
+- The before and after proof is mandatory. A script checks it at each stage, joins each pair into one side-by-side image, and checks the images are on the Jira ticket and in every PR. Only you can skip it, by saying "skip proof".
 - You get updates in simple words: a progress table, what was just fixed and why, and what is being fixed now. Every 10 minutes by day, every hour in the evening, none overnight.
 - The chat is named after the ticket: `PROJ-123` for the pipeline, `JC PROJ-123` for Jira comments, `GC PROJ-123 #45` for GitHub comments.
 

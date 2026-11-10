@@ -22,13 +22,13 @@ It does not allow the items on the "Ask first" list, a merge, or anything touchi
 ## Steps
 
 1. **Plan.** Run `blueprint` with everything the user wrote. It finds the task, claims it, renames the chat, reproduces the bug with `reproduce`, researches, and writes the plan.
-   Done when `blueprint` step 9 has posted the plan and the simple explanation. A bug that will not reproduce ends the run here, with the report and a question.
+   Done when `blueprint` step 9 has posted the plan and the simple explanation, and `gate before` printed PASS. A bug that will not reproduce is worked on for 3 rounds first (`reproduce` step 4). If it still will not, the run ends here, with the report and a question.
 2. **Build and check.** Run `ship`. It builds in the worktree, calls `inspect`, fixes what `inspect` finds, and repeats until the gate passes.
    Done when the score is 100, the live run passed and the QA verdict is Done or Done with notes, all on one commit.
 3. **Prove.** `ship` step 5 takes the after proof with `lane`, the same way the before proof was taken.
-   Done when every before file has an after file.
+   Done when `gate after` printed PASS and the comparison images exist.
 4. **Open the PR and update Jira.** `ship` close-out.
-   Done when the PR is open with the before and after table and the ticket carries the same proof.
+   Done when `proof.py verify` printed PASS: the comparison images are on the Jira ticket and in every PR description.
 5. **Babysit.** Run `babysit` on every PR. Fix CI, answer and resolve every comment, keep the branch up to date. After each push, run the live steps the fix touches and add the fresh proof.
    Done when CI is green, nothing is unresolved, and the ticket is in Code Review with a worklog.
 6. **Stay until merged.** Keep the watch running. Come back for every new comment, failed check or conflict. Never merge the PR yourself, unless the user wrote "full send and merge" and the repo's rules allow it.

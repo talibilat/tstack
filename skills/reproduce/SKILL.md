@@ -7,7 +7,7 @@ Never assume a requirement. Check Jira for the latest requirements before acting
 
 # reproduce
 
-See the bug with your own eyes, and keep the proof. A bug that has not happened in front of you is not reproduced, and nothing gets planned on it. The before screenshots taken here are shown next to the after screenshots in the PR and in Jira, so both must come from the same steps.
+See the bug with your own eyes, and keep the proof. A bug that has not happened in front of you is not reproduced, and nothing gets planned on it. The before proof you save here is half of the before and after comparison that goes to Jira and GitHub, so it is the most important output of this skill. The before screenshots taken here are shown next to the after screenshots in the PR and in Jira, so both must come from the same steps.
 
 Read `~/.agents/skills/blueprint/references/conventions.md` first. If `blueprint` called you, the ticket file, the worktrees and the baseline already exist. If the user called you alone, run `blueprint` steps 1 to 4 first, then continue here, and hand back to `blueprint` step 6 when you finish.
 
@@ -20,6 +20,7 @@ Read the ticket, its comments and attachments, and the chat. Write `.scratch/<KE
 ```
 Reproduced: not yet
 Live environment: <lane number and commits, or how the app was run>
+Method: <visible Chrome on the lane, Docker lane, or a script because <reason>>
 Where: <lane URL, page or command>   Account and data: <role, fixture, file>
 | # | Action | Expected (correct behavior, with its source) | What the report says happens | Proof file name |
 ```
@@ -45,6 +46,8 @@ Done when `<KEY>-history.md` exists.
 
 Reproduce in the live environment only: a running copy of the app. Before you start a local copy, sync every repo with dev: `~/.agents/skills/lane/scripts/sync-dev.sh <worktree> ...`. A local copy is never behind dev. A local one counts: Docker, and for Aruva a `lane` (a private Docker copy) built from the current default branch. For other apps, start the app from the worktree with its own Docker or run command. A deployed dev environment also counts when the report was made there. Follow `<KEY>-repro.md` one step at a time and check each step's result before taking the next. Write the environment on the second line of `<KEY>-repro.md`, for example `Live environment: lane 2 from uok-be abc1234, uok-fe def5678`.
 
+**Use the real thing, where you can watch it.** Run the app in Docker (a `lane` for Aruva) and drive it in real Google Chrome on this computer, with a visible window, one step at a time, taking each screenshot as the behavior happens. `lane shot` and the flows open a visible Chrome window by default. Do not use a background or headless script or a recorded flow, unless there is no other option. In that case write the reason on the `Method:` line (`Method: headless script because <reason>`). The proof gate rejects a script method with no reason.
+
 - **UI first.** For Aruva use the `lane` skill: claim a lane built from the worktrees and drive the real UI. For other apps use the browser tools from the conventions file. You may use the user's computer and terminal freely for this.
 - **Terminal otherwise.** When the bug has no screen (API, worker, CLI, data), reproduce it with real calls and commands against that same running app.
 - If an old regression test exists, run it and say why it did not catch this case.
@@ -55,33 +58,40 @@ Only the live environment counts. The wrong behavior must happen in front of you
 
 Done when `Reproduced: yes` is written because the wrong behavior happened in front of you on the current default branch, or the timebox ran out and you go to step 4.
 
-## 4. If it will not reproduce
+## 4. If it will not reproduce: name the blocker, then fix it
 
-Set the first line of `<KEY>-repro.md` to `Reproduced: no`, or `Reproduced: already fixed` when the current code is fine and the history names the PR or commit that fixed it. Save what you tried under `before/` anyway (screenshots of the screen as it behaves now, logs), close every window and tab, and give the lane back.
+Nothing moves forward until the bug reproduces. Do not stop at the first failure, and do not report yet. Find out what blocks you and clear it yourself. Up to 3 rounds, each one a new attempt:
 
-Write a short report, 8 lines or fewer, in plain words. Post it in chat and save it at the end of `<KEY>-repro.md`:
+1. Name the blocker in one line, from the table.
+2. Do what the table says.
+3. Run the steps again, in the live environment.
 
-```
-Could not reproduce <KEY>
-
-What I tried: <the steps, where (environment and commit), which account and data, and the approaches>
-What happened: <what I saw instead, with the proof file or log>
-Why I think it did not reproduce: <one reason from the list below, with the evidence>
-How we can reproduce it: <the smallest thing that would unblock it, and who can give it>
-```
-
-Pick the most likely reason, and say plainly when you are not sure:
-
-| Reason | How we can reproduce it |
+| Blocker | You do |
 |---|---|
-| The report is missing steps or data (which screen, which account, which file) | The reporter gives exact steps, a screen recording or the file |
-| It needs an account, role, file or data I do not have | Someone provides it, or I create the data if you say how |
-| The environment differs: a setting, a feature flag, a version, or a service key that is not available locally (name it) | A working key or setting, or a run on the environment where it was seen |
-| It depends on timing, load or order and happens only sometimes | A log or request id from a real failure, then a run that repeats the same order |
-| It is already fixed on the current branch (name the PR or commit) | Confirm with the reporter, then close the ticket |
-| I could not run the app here (name what blocked it) | Fix that blocker, then run it again |
+| Docker or the lane will not start | Start Docker (`open -a Docker`), free memory, run `lane doctor`, follow `lane/references/troubleshooting.md`, start again |
+| The local copy is behind dev or on the wrong commit | Run `sync-dev.sh`, rebuild, and check out the commit the report names |
+| Missing data, account or file | Create it in the live copy with the shape the report names (fixture accounts are in `lane/references/accounts.md`, and a small sample file) |
+| The environment differs (a setting, a feature flag, a service key) | Read the settings of the environment where it was seen, copy the relevant one into the lane, or reproduce on the deployed dev environment when the report was made there |
+| The steps are missing or unclear | Read every comment, attachment and video on the ticket and its parents again, search similar tickets, and try each reasonable reading of the steps |
+| It happens only sometimes (timing, load, order) | Repeat the steps 10 times, change the order, double-click, slow the network, and read the backend log of the failing request |
+| It needs something only the user has (a valid key, a real account, a real file) | Ask for exactly that with `request_secret` or one `AskUserQuestion`, then carry on |
+| It is already fixed on current dev | Find the PR or commit (`git log -S`, search PRs) and save the evidence. Then go to the report |
 
-Reply to the caller with `Reproduced: no` or `already fixed` and the report. Never guess a root cause, never invent steps that happened, and never write a plan.
+When a round makes it reproduce, go on to step 5. When 3 rounds fail, or the blocker needs the user:
+
+1. Set the first line of `<KEY>-repro.md` to `Reproduced: no` (or `already fixed`). Save what you tried under `before/`, close every window and tab, and give the lane back.
+2. Post a short report in chat, 8 lines or fewer, in plain words, and save it at the end of `<KEY>-repro.md`:
+
+   ```
+   Could not reproduce <KEY>
+
+   What I tried: <steps, environment and commit, account and data, the rounds>
+   What happened: <what I saw instead, with the proof file or log>
+   What is blocking it: <the blocker from the table, with the evidence>
+   How we resolve it: <the smallest thing that unblocks it, and who gives it>
+   ```
+
+3. Reply to the caller with `Reproduced: no` and the report. Never guess a root cause, never invent steps that happened, and never write a plan.
 
 ## 5. Save the before proof
 
@@ -91,9 +101,17 @@ Save into `.scratch/<KEY>-evidence/before/`, using the file names from `<KEY>-re
 - The logs for the failing action: backend and AI logs (`lane logs N <service>`), the browser console and the failed network request, saved as `.txt`.
 - `commit.txt` with the commit of each repo the app was built from.
 
-Strip tokens, secrets and personal data. Then close every browser window and tab you opened, and give the lane back with `lane down N`.
+Save each screenshot at the moment the bug shows. Never overwrite `before/` later, because the after proof is compared against it. It lives in `.scratch/<KEY>-evidence/before/`, and stays there until the PR is merged and is then archived.
 
-Done when every step in `<KEY>-repro.md` has its proof file and no window or lane is left open.
+Strip tokens, secrets and personal data. Close every browser window and tab you opened, and give the lane back with `lane down N`. Then run the before gate:
+
+```
+python3 -I ~/.agents/skills/blueprint/scripts/proof.py gate before <KEY>
+```
+
+It checks the result, the live environment and method lines, that every step has a real screenshot, and that the logs exist. Paste its last line in chat.
+
+Done when the gate prints `before gate: PASS`, and no window or lane is left open.
 
 ## 6. Turn it into a failing test
 
@@ -111,6 +129,8 @@ Set the first line of `<KEY>-repro.md` to `Reproduced: yes`. Reply to the caller
 
 - Never report `Reproduced: yes` from the ticket text, the code or a unit test alone. It must have happened in the live environment.
 - Never let the caller plan a bug that did not reproduce. Report `no` or `already fixed` with the reason.
+- Never report `Reproduced: yes`, or move on, before `gate before` prints PASS.
+- Never use a background or headless script when visible Chrome or Docker works.
 - Never keep a terminal screenshot as the only proof of a UI bug.
 - Never leave a browser window, tab or lane open.
 - Never push in this skill.

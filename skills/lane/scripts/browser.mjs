@@ -1,4 +1,4 @@
-// Drive a lane's frontend in real Google Chrome (headless by default) through playwright-core.
+// Drive a lane's frontend in real Google Chrome, with a visible window by default, through playwright-core.
 // Import openLane() for your own flows, or use shot.mjs for a one-off screenshot.
 //
 //   import { openLane } from '<skill>/scripts/browser.mjs';
@@ -7,7 +7,8 @@
 //   await close();
 //
 // Env (set by `lane shot`, or export yourself): LANE_FE=http://localhost:<fe port>, LANE_DIR=<lane folder>,
-// LANE_SCRIPTS=<this folder>, LANE_N=<lane number>. HEADED=1 shows the window.
+// LANE_SCRIPTS=<this folder>, LANE_N=<lane number>. HEADLESS=1 hides the window. Use it only when there is no other option,
+// and say why in the Method line of the repro file.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -74,7 +75,7 @@ export async function openLane({ as = 'e2e-professor@example.com', password, vie
 	const authDir = join(env('LANE_DIR'), '.auth');
 	mkdirSync(authDir, { recursive: true });
 	const statePath = join(authDir, `${as}.json`);
-	const browser = await chromium.launch({ channel: 'chrome', headless: !process.env.HEADED });
+	const browser = await chromium.launch({ channel: 'chrome', headless: !!process.env.HEADLESS });
 	const ctxOpts = { baseURL: base, viewport };
 	let context = await browser.newContext(existsSync(statePath) ? { ...ctxOpts, storageState: statePath } : ctxOpts);
 	context.setDefaultTimeout(60_000); // Playwright's default is no limit: a stuck click would hang the run
