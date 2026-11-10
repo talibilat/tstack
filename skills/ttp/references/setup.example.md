@@ -13,6 +13,7 @@ Copy this file to `setup.md` in the same folder and fill it in. If `setup.md` is
 | Status names | `To Do`, `In Progress`, `Code Review`. Rename to match your workflow. |
 | Transitions | Ids can differ by project. Always match by status name. |
 | Planning | Fix versions? Estimates? Sprints? |
+| BAs | Names and account ids of the business analysts whose written words decide requirements. Empty means the authors of epics and requirement tickets. |
 | Story points | Field id, or `none`. Looked up on the first run and recorded here. |
 | Candidate query | `project in (KEY1, KEY2) AND status = "To Do" AND assignee = currentUser() ORDER BY Rank ASC` |
 

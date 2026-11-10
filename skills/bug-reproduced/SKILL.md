@@ -1,64 +1,83 @@
 ---
 name: bug-reproduced
-description: Plan a Jira bug that came back after earlier work (a reopened ticket, a new ticket for the same problem, or a regression of a past fix). Searches Jira, PR, git and archive history, reproduces the bug on current dev, says why it came back, and writes a plan that builds on the old work. Use when the user says a bug is back, reproduced, reopened or a repeat, or when ticket-plan finds earlier work on a ticket. Hands off to ticket-ship.
+description: Reproduce a bug before any plan is written. Checks whether it was worked on before, replays it step by step on the current default branch (in the UI first, the terminal otherwise), saves the before screenshots and logs, turns it into a failing test and names the root cause. Use when ttp reaches its reproduce step, or when the user says to reproduce a bug, or that a bug is back, reopened or a repeat.
 ---
+
+Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
 
 # bug-reproduced
 
-Same flow as `ticket-plan`, plus a history check and a different plan. Read these first:
+See the bug with your own eyes, and keep the proof. The before screenshots taken here are shown next to the after screenshots in the PR and in Jira, so both must come from the same steps.
 
-1. `~/.agents/skills/ticket-plan/references/conventions.md`
-2. `~/.agents/skills/ticket-plan/SKILL.md`, the steps you follow below
-3. `~/.agents/skills/ticket-plan/references/plan-template.md`
+Read `~/.agents/skills/ttp/references/conventions.md` first. If `ttp` called you, the ticket file, the worktrees and the baseline already exist. If the user called you alone, run `ttp` steps 1 to 4 first, then continue here, and hand back to `ttp` step 6 when you finish.
 
-If you are not Claude Code inside T3, read the "Using these skills from another agent" table in that file first and swap the tools as it says.
+Update the `repro` row of the progress board after each step.
 
-Input: the new ticket key, and optionally the old key. With a key, run in autopilot: ask nothing and follow the Autopilot section of the conventions file. The user's message with the call outranks everything here. With no key, start at step 1 of `ticket-plan` and let the user pick.
+## 1. Write the repro steps
 
-## Steps
+Read the ticket, its comments and attachments, and the chat. Write `.scratch/<KEY>-repro.md`:
 
-Run these in order. Steps marked "as in plan" are the same steps as in `ticket-plan`.
+```
+Where: <lane URL, page or command>   Account and data: <role, fixture, file>
+| # | Action | Expected (correct behavior, with its source) | What the report says happens | Proof file name |
+```
 
-1. **Free check and claim.** As in plan, steps 2 and 3 (second fetch, T3 chat search, claim, confirm, rename the chat to the key). The "earlier work" hit from step 2.3 is expected here, so skip the Repeat bug card.
-2. **Ticket file.** As in plan, step 4.1.
-3. **History search.** See below. Write `.scratch/<KEY>-history.md`.
-4. **Verdict.** Pick one and say why in 3 lines or fewer:
-   - old fix incomplete
-   - a later change broke it
-   - different root cause
-   - never really fixed
-5. **Repos and worktrees.** As in plan, steps 4.2 and 5, with this rule:
-   - If the old PR is still open, reuse the old branch. Recreate its worktree from the archive with `git worktree add <path> <old branch>`, then `git fetch` and rebase onto `origin/dev` only after asking.
-   - If the old PR is merged or closed, make a new branch from fresh `origin/dev`, named for the new key.
-6. **Baseline.** As in plan, step 6.
-7. **Reproduce on current `dev`.** As in plan, step 7, with these changes. The bug must reproduce on current `dev` before any plan is written. If an old regression test exists, run it first and say why it did not catch this case. The new repro test extends the old one where it can. If the bug does not reproduce, show the Repro stuck card.
-8. **Plan.** As in plan, step 8, with `Repeat bug: yes` and these two sections filled in:
-   - **Previous attempt.** Old ticket, PR, files changed, what the fix did, and how it was tested.
-   - **Why it came back.** The verdict, and the evidence.
-9. **Jira link.** If the new and old tickets have no link, add "Relates" with `createIssueLink`. Use `getIssueLinkTypes` for the exact name.
-10. **Show it.** As in plan, step 9, with one extra line at the top of the brief: "This is a repeat of <old key>."
-11. **Hand off.** As in plan, step 10. When calling `ticket-ship`, say it is a repeat bug and give the old key and PR number. Ship then adds the "Earlier work" line to the Jira comment and the PR body.
+Number the proof file names (`01-open-course.png`, `02-save-error.png`). The after proof reuses the same names. If the ticket shows UI screenshots, the steps go through the UI and the proof is UI screenshots of the same screens.
 
-## History search
+Done when a person could follow the steps without reading the ticket.
 
-Jira, done in the main chat:
+## 2. Check the history
 
-- The old ticket: description, comments, fix version, worklogs, who worked on it.
-- Issue links on both tickets (relates, clones, blocks, duplicates).
-- Tickets in the same epic, with the same labels, or with a similar summary (`text ~ "<key words>"`), resolved in the last 12 months.
+Look for earlier work on this problem.
 
-GitHub, git and local files, done by one read-only child (Cursor first, Sonnet fallback, see the conventions file). Tell it to read only, write `.scratch/<KEY>-history-repos.md` and reply in 40 lines or fewer:
+- Jira, in the main chat: issue links on the ticket (relates, clones, duplicates), tickets in the same epic or with a similar summary (`text ~ "<key words>"`) resolved in the last 12 months, and for each old ticket its description, comments, fix version and who worked on it.
+- GitHub, git and local files, by one read-only sub-agent that writes `.scratch/<KEY>-history-repos.md` and replies in 40 lines or fewer: PRs that mention the old key, their changed files, review comments and failed checks, other PRs that changed the same files since, `git log --oneline` on those files since the old fix merged, and `<root>/archived-worktrees/<old key>/archive.md`.
 
-- PRs that mention the old key, from `gh pr list -R <org>/<repo> --search "<old key>" --state all`
-- For each, the changed files, the review comments and any failed checks
-- Other PRs that changed the same files since the old fix
-- `git log --oneline` on the files the new ticket touches, since the old fix merged, to spot commits that could have undone it
-- `<root>/archived-worktrees/<old key>/archive.md` and any `.scratch/<old key>-*.md` files
+Merge both into `.scratch/<KEY>-history.md`. With no earlier work, write "No earlier work found" and what you searched.
 
-Merge both parts into `.scratch/<KEY>-history.md`. The "Previous attempt" section of the plan summarizes it: old ticket, what was fixed, which PR, which files, and why it may have come back.
+When earlier work exists, this is a repeat bug. Pick one verdict and give the evidence in 3 lines or fewer: old fix incomplete, a later change broke it, different root cause, or never really fixed. If the old and new tickets have no link, add "Relates" with `createIssueLink`. If the old PR is still open, reuse its branch and rebase only after asking. If it is merged or closed, keep the new branch.
+
+Done when `<KEY>-history.md` exists.
+
+## 3. Reproduce it live, step by step
+
+Run the app from the current default branch and follow `<KEY>-repro.md` one step at a time. Check each step's result before taking the next.
+
+- **UI first.** For Aruva use the `ttl` skill: claim a lane built from the worktrees and drive the real UI. For other apps use the browser tools from the conventions file. You may use the user's computer and terminal freely for this.
+- **Terminal otherwise.** When the bug has no screen (API, worker, CLI, data), reproduce it with real calls and commands.
+- If an old regression test exists, run it and say why it did not catch this case.
+
+Timebox: 30 minutes or 3 different approaches, then show the "Repro stuck" card from the `ttp` cards file. Correct `<KEY>-repro.md` whenever the real steps differ from the report.
+
+Done when the wrong behavior happened in front of you, on the current default branch.
+
+## 4. Save the before proof
+
+Save into `.scratch/<KEY>-evidence/before/`, using the file names from `<KEY>-repro.md`:
+
+- A screenshot for every step. UI screenshots whenever the bug shows in the UI. A terminal screenshot or a saved transcript is extra proof, never a replacement for a UI screenshot.
+- The logs for the failing action: backend and AI logs (`lane logs N <service>`), the browser console and the failed network request, saved as `.txt`.
+- `commit.txt` with the commit of each repo the app was built from.
+
+Strip tokens, secrets and personal data. Then close every browser window and tab you opened, and give the lane back with `lane down N`.
+
+Done when every step in `<KEY>-repro.md` has its proof file and no window or lane is left open.
+
+## 5. Turn it into a failing test
+
+Use the `tdd` skill to write an automated test that fails for the same reason. Extend the old regression test where one exists. Commit it locally as `<KEY>: add failing test that reproduces the bug`. Never push it. If the repo has no test setup, save a script that reproduces the bug under `.scratch/<KEY>-reviews/`.
+
+Done when the test or script goes red on the bug.
+
+## 6. Name the root cause and report
+
+Use the `diagnosing-bugs` skill to find the cause. Add to `<KEY>-repro.md`: the root cause with `file:line`, the failing test path, and for a repeat bug the verdict from step 2.
+
+Reply to the caller with: reproduced yes or no, the root cause in 2 lines, the proof folder, and "This is a repeat of <old key>" when it is one. `ttp` then fills the plan's Reproduction, Previous attempt and Why it came back sections from these files.
 
 ## Never
 
-- Never write the plan before the bug reproduces on current `dev`.
-- Never reuse an old branch whose PR is merged.
+- Never write a plan before the bug reproduces on the current default branch.
+- Never keep a terminal screenshot as the only proof of a UI bug.
+- Never leave a browser window, tab or lane open.
 - Never push in this skill.

@@ -3,6 +3,8 @@ name: plain-talk
 description: Explain any situation, ticket, bug, PR, skill or technical result as a short story in everyday language, like talking to a friend who does not work in tech. Always opens with the name of the problem being solved. Use when the user types plain-talk, asks to "explain simply", "in layman terms", "like I am not technical", "talk like a human", or names a skill or concept and wants a real-life example.
 ---
 
+Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
+
 # plain-talk
 
 Tell it like a person telling a story, not like a report. The reader does not work in tech. They want to know what the problem was, what happened, and what comes next.
@@ -42,7 +44,7 @@ Open with the name of the shared problem or theme ("This week's job: tidying up 
 
 ## When the user names a skill, tool or concept
 
-If the user types the skill name plus a topic, for example `plain-talk ticket-ship` or `plain-talk what is a git worktree`, open with the name of the problem that thing solves, then tell the story with a real-life example from everyday life. Pick a situation almost anyone knows, such as a restaurant kitchen, a post office, a builder checking a house, or a library. Show what the thing does in that picture, then say what it means for them. Do not stretch the comparison past the point where it stays true.
+If the user types the skill name plus a topic, for example `plain-talk tts` or `plain-talk what is a git worktree`, open with the name of the problem that thing solves, then tell the story with a real-life example from everyday life. Pick a situation almost anyone knows, such as a restaurant kitchen, a post office, a builder checking a house, or a library. Show what the thing does in that picture, then say what it means for them. Do not stretch the comparison past the point where it stays true.
 
 ## Examples
 
@@ -68,8 +70,8 @@ Several tickets:
 >
 > There were six small problems in total. Four are fixed and checked, and two are still being built. The one worth watching is the password reset, because it has broken twice before, so we are testing it extra carefully this time. Nothing needs your input right now.
 
-Named skill (`plain-talk ticket-ship`):
+Named skill (`plain-talk tts`):
 
 > **The problem: getting a finished piece of software work safely out the door.**
 >
-> Think of a builder finishing a house extension. They do not just hand over the keys. Several inspectors check different things, like the wiring, the plumbing and the structure, and only when all of them sign off does the owner get the keys. `ticket-ship` does the same for software work: it builds the change, has several reviewers check it, tests it for real, and only then hands it over for approval.
+> Think of a builder finishing a house extension. They do not just hand over the keys. Several inspectors check different things, like the wiring, the plumbing and the structure, and only when all of them sign off does the owner get the keys. `tts` does the same for software work: it builds the change, has several reviewers check it, tests it for real, and only then hands it over for approval.

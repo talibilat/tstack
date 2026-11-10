@@ -1,6 +1,6 @@
 ---
 name: ttl
-description: Time to live. Gives each agent its own small, isolated copy of Aruva (a lane) built from its worktree, so many agents can run the app at once, test it in the browser, over the API and in the terminal, and save screenshot proof. Use when the user types ttl, or an agent needs to run, live test, QA, demo or screenshot an Aruva change.
+description: Time to live. Gives each agent its own small, isolated copy of Aruva (a lane) built from its worktree, so many agents can run the app at once, test it in the browser, over the API and in the terminal, and save before and after screenshots and logs. Use when the user types ttl, or when bug-reproduced, ttq or tts needs to reproduce, live test, demo or screenshot an Aruva change.
 ---
 
 # ttl (time to live)
@@ -8,6 +8,16 @@ description: Time to live. Gives each agent its own small, isolated copy of Aruv
 A **lane** is one agent's private Aruva: its own database, Redis, Qdrant, Neo4j, backend, AI service and frontend, on its own ports. The heavy stateless services (document parser, content extractor, PII masking) are shared from the always-on base stack. Many agents can each hold a lane at once without touching each other's data, ports or containers.
 
 Everything goes through one command, `lane`, in this skill's `scripts/` folder. Below, `lane` means `~/.agents/skills/ttl/scripts/lane`.
+
+The pipeline uses a lane three times, and each use follows the steps below:
+
+| Called by | Lane is built from | Proof goes to |
+|---|---|---|
+| `bug-reproduced` (before proof) | The worktrees at the current default branch, before any fix | `.scratch/<KEY>-evidence/before/` |
+| `ttq` (live run) | The worktrees at the commit under review | `.scratch/<KEY>-evidence/` and `after/` |
+| `tts` step 5 (after proof) | The worktrees at the final commit | `.scratch/<KEY>-evidence/after/`, same file names as `before/` |
+
+Before and after are taken the same way: follow `.scratch/<KEY>-repro.md` step by step, with the same account and data.
 
 ## Steps
 
@@ -38,10 +48,10 @@ Everything goes through one command, `lane`, in this skill's `scripts/` folder. 
    Accounts and seeded courses are in `references/accounts.md`. After you change code, run `lane rebuild N be|ai|fe` and test again.
    Done when every step of the ticket's live test has a result and a proof file.
 
-4. **Save proof** into the ticket's evidence folder (for ticket-ship that is `.scratch/<KEY>-evidence/`). `lane proof N <label>` gives a folder inside the lane if you need scratch space. Strip tokens, secrets and personal data from text proof.
-   Done when the evidence folder holds every proof file the live test names.
+4. **Save proof** into the task's evidence folder, in the subfolder the table above names. UI screenshots are the proof for anything that shows in the UI. Save the logs for the same action beside them: `lane logs N api > <folder>/NN-api-log.txt`, and the same for the AI service when it is involved. `lane proof N <label>` gives a folder inside the lane if you need scratch space. Strip tokens, secrets and personal data from text proof.
+   Done when the evidence folder holds every proof file the repro steps and the live test name, and the logs for each.
 
-5. **Give the lane back.** Run `lane down N` as soon as testing ends, also after a failure. It deletes the lane's containers, data, volumes and built images, and copies anything under the lane's `proof/` folder to `<LANES_HOME>/proofs/`.
+5. **Give the lane back.** Close every browser window and tab you opened. Run `lane down N` as soon as testing ends, also after a failure. It deletes the lane's containers, data, volumes and built images, and copies anything under the lane's `proof/` folder to `<LANES_HOME>/proofs/`.
    Done when `lane ls` no longer shows lane N.
 
 ## Rules

@@ -1,5 +1,7 @@
 # Review loop
 
+The four code reviewers, the score, the QA validation child and the fix rounds. `ttq` runs the checks. `tts` makes the fixes between rounds.
+
 ## The four reviewers
 
 | Reviewer | What the child reads and does (find each skill as the conventions file's Companion skills section says) |
@@ -11,14 +13,14 @@
 
 ## Start a round
 
-Start the reviewers of the round together with `delegate_task`, role `review`. Round 1 runs all four. Later rounds run only the reviewers that still have open findings. When those pass, run one last pass with all four.
+Start the reviewers of the round together with `delegate_task`, role `review`, at the same moment as the live run. Round 1 runs all four. Later rounds run only the reviewers that still have open findings. When those pass, run one last pass with all four.
 
 Target: Cursor `auto-smart` on `cost` first. A Cursor error or limit means run that reviewer again on Sonnet medium. See the conventions file.
 
 Brief for every reviewer, with paths and no pasted text:
 
 ```
-Review the change in <worktree path> against origin/dev. Ticket: <path>. Plan: <path>. Requirements and knowledge: <~/.agents/ticket-knowledge/<EPIC>.md>. Judge the change against the original requirements, not only the ticket.
+Review the change in <worktree path> against origin/<default branch>. Ticket: <path>. Plan: <path>. Decision log: <path>. Requirements and knowledge: <~/.agents/ticket-knowledge/<EPIC>.md>. Judge the change against the original requirements, not only the ticket.
 Read <the reviewer's SKILL.md path, found as above> and follow it, with these overrides:
 - Review only. Do not edit, stage, commit or push anything.
 - Do not rename the chat. Do not ask the user questions.
@@ -48,24 +50,25 @@ Show this table in chat and append it to `.scratch/<KEY>-reviews.md`:
 
 Then: `Combined score: <n>/100`, the postwork score and gate on one line, and `Live test: PASS | FAIL | NOT RUN (commit <sha>)`.
 
-## QA review (after the code reviewers pass)
+## QA validation (after the code reviewers pass)
 
-Start it only when the four code reviewers have no verified in-scope findings, postwork says PASS, and the live test passed on the current commit.
+Start it only when the four code reviewers have no verified in-scope findings, postwork says PASS, and the live run passed on the current commit.
 
 Start one `delegate_task` child (role `review`, Claude Sonnet medium). Do not send it to Cursor: it runs the app and creates test data. Brief, with paths and no pasted text:
 
 ```
-Run the aqa skill in pipeline mode for <KEY>. Read ~/.agents/skills/aqa/SKILL.md and follow it.
-Worktree: <path>. Ticket: <path>. Plan: <path>. Live test: <path>. Evidence folder: <path>.
-Write the full report to <.scratch/<KEY>-reviews/aqa-r<N>.md>. Reply with the TL;DR, the verdict and the failing items in 25 lines or fewer.
+Run the QA validation of the ttq skill in pipeline mode for <KEY>. Read ~/.agents/skills/ttq/SKILL.md and follow its sections 2 to 5 and its pipeline mode limits. Do not start the code reviewers or any other sub-agent.
+Worktree: <path>. Ticket: <path>. Plan and its checklist: <path>. Decision log: <path>. Repro steps: <path>. Live run: <path>. Evidence folder: <path>.
+Replay any repro step whose after proof is missing for this commit. Tick "verified" on each checklist line you proved, and list the lines you could not prove.
+Write the full report to <.scratch/<KEY>-reviews/ttq-r<N>.md>. Reply with the TL;DR, the verdict and the failing items in 25 lines or fewer.
 ```
 
 Afterward, run the same `git status --porcelain` check as for the code reviewers.
 
 Handle the verdict:
 
-- **Done, or Done with notes.** The QA review passes. Notes and Low-only items go to the Follow-ups list. Add an `aqa` row to the table with the verdict as its gate.
-- **Stays open / back to dev.** Check each failing item yourself, like any finding. An AC marked Fail counts as High. A Partial AC counts as Medium. A drafted bug counts by its priority: Highest 25, High 10, Medium 5, Low 2. Verified items go into the phase 2 plan. This is a failed round. After the fix, run steps 2 to 4 of the skill, re-run the code reviewers that had findings, then run the QA review again.
+- **Done, or Done with notes.** The QA validation passes. Notes and Low-only items go to the Follow-ups list. Add a `QA validation` row to the table with the verdict as its gate.
+- **Stays open / back to dev.** Check each failing item yourself, like any finding. An AC marked Fail counts as High. A Partial AC counts as Medium. A drafted bug counts by its priority: Highest 25, High 10, Medium 5, Low 2. Verified items go into the phase 2 plan. This is a failed round. After the fix, `tts` runs its steps 2 and 3 again, then `ttq` runs the live run, the code reviewers that had findings, and the QA validation again.
 - **Needs BA input.** Stop. Show the ambiguous or conflicting requirement and ask the user, even in autopilot.
 
 Bug drafts for problems outside this ticket go to the Follow-ups list and the final message. Never file them in Jira from the loop. Offer to file them, and file only after the user confirms.
@@ -77,7 +80,7 @@ Show a short plan in chat before touching code:
 | Finding | Fix | Files | Owner subpart |
 |---|---|---|---|
 
-Start a fresh builder per independent group (Sonnet medium, at most 3 at once). The brief is the finding rows plus the worktree path. Then run steps 2, 3 and 4 of the skill again (re-check the bug, baseline and scope, live test), commit the fixes as `<KEY>: <what changed>`, and start the next round.
+`tts` starts a fresh builder per independent group of findings (Sonnet medium). The brief is the finding rows plus the worktree path. Then it runs its steps 2 and 3 again (re-check the bug, baseline and scope), commits the fixes as `<KEY>: <what changed>`, and calls `ttq` for the next round, which starts with a fresh live run on the new commit.
 
 ## Round limits
 

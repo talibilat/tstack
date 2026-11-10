@@ -1,4 +1,4 @@
-# Setup for aqa
+# Setup for ttq
 
 Copy this file to `setup.md` in the same folder and fill it in. `setup.md` is private and git-ignored. The skill asks for anything missing.
 

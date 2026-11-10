@@ -2,6 +2,29 @@
 
 Every plan, build and review starts from the original requirement documents, not from the ticket text alone. Tickets are summaries. The requirement documents are the truth.
 
+## The single authority
+
+What the product must do is decided only by words a BA wrote in Jira: an epic, a ticket, a comment, a linked page or an attachment. Treat those words as the single authority.
+
+- The BAs are listed in `setup.md`. Search for everything each BA wrote on the ticket, its parents, the epic and the related tickets, and read all of it. When the list is empty, treat the authors of the epic and of the requirement tickets as BAs, and say so in the decision log.
+- Check BA text again at every stage: before planning, before each fix round, and in QA. A new comment can change the answer.
+- A requirement decision without a BA quote is not made. It becomes a question for the BA under Blockers.
+- Text by developers, testers or agents is context. It can point to a BA decision. It cannot replace one.
+- Related and future tickets count. A BA's words on a later ticket in the same epic tell you what this change must not break or do early.
+
+## The decision log
+
+Keep `.scratch/<KEY>-decisions.md`. Every decision made while planning, building or fixing gets one row.
+
+```
+| # | Decision | Kind | Backed by | Quote or evidence |
+|---|---|---|---|---|
+| 1 | <what was decided> | requirement | <KEY>, <BA name>, <date> | "<the BA's exact words>" |
+| 2 | <what was decided> | build choice | <file:line, research file, or test output> | <what it shows> |
+```
+
+Kind is "requirement" (what the product must do, BA quote required) or "build choice" (how the code is done, code evidence required). Builders, reviewers and `ttq` all get this file's path.
+
 ## Find the requirement documents
 
 Follow the links from the ticket until you reach the source. Stop at 3 hops from the ticket for each branch.
@@ -48,5 +71,5 @@ Rules:
 
 - Read the file first. If it exists and its Updated date is recent and no source changed, use it and skip re-reading every document. Check the version list of each source for changes.
 - Update it whenever a search finds something new or something changed: a new version, an override, a gap closed. Edit the existing line, do not append duplicates.
-- Put a one-line "Requirements used" entry in the plan, listing the document, version and date. Give reviewers and `aqa` the knowledge file path as well as the ticket and plan paths.
+- Put a one-line "Requirements used" entry in the plan, listing the document, version and date. Give reviewers and `ttq` the knowledge file path and the decision log path as well as the ticket and plan paths.
 - A change you learn about mid-build (a comment, a new version) goes into the knowledge file and the plan before the next batch starts. If it changes the acceptance criteria, treat it as a failed round and replan.

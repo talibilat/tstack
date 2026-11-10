@@ -1,3 +1,5 @@
-skills/ticket-plan/references/setup.md
-skills/aqa/references/setup.md
+skills/ttp/references/setup.md
+skills/ttq/references/setup.md
 node_modules/
+__pycache__/
+skills/postwork/references/matt-code-review.md

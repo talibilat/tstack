@@ -1,41 +1,167 @@
-# skills
+# tstack
 
-Agent skills that take a Jira ticket from To Do to a reviewed pull request.
+The agent skills I use every day to take a Jira ticket from To Do to a merged
+pull request, with before and after proof. They work in Claude Code, Codex and
+Cursor. Some use [T3 Code](https://github.com/pingdotgg/t3code) features when
+they are available and fall back to native tools when they are not.
 
-## Install
-
-```
-npx skills@latest add talibilat/skills -g
-```
-
-Add `--all` to skip the prompts, then restart your agent.
+The idea and the layout of this repo come from
+[t3dotgg/tstack](https://github.com/t3dotgg/tstack). The skills are my own.
 
 ## Skills
 
-| Skill | Short name | What it does |
+| Skill | Say | What it does |
 |---|---|---|
-| `ticket-plan` | `ttp` | With no ticket key, asks for epic, work type, priority and order, then picks the best To Do ticket. With a key or Jira link (`ttp PROJ-123`) it asks nothing, starts the work and carries on into `ticket-ship`. It traces the ticket to its original requirement documents and keeps a project knowledge file up to date. It claims the ticket, renames the chat to the ticket key, makes its own git worktrees, reproduces bugs and writes a checked plan with a plain-language brief. |
-| `ticket-ship` | `tts` | Works alone: give it a key, or plain instructions, and it plans first if no plan exists. Builds the plan with parallel sub-agents, then needs a passing live test (browser or real run, or steps for you). Four code reviewers and then an `aqa` QA review give a score out of 100, with up to 5 fix rounds on its own, stopping when the loop is stuck. Then it opens the PR with screenshot or API proof, comments in Jira, archives the worktree and, once the PR is good, moves the ticket to Code Review and logs time. It keeps watching until the PR is merged, fixing CI and resolving every review comment. |
-| `bug-reproduced` | | For a bug that came back. Searches Jira, PR and git history, reproduces it on the default branch, says why it returned, and plans from the earlier work. |
-| `aqa` | `ttq` | Senior QA validation of a ticket or bug fix. Finds the parent chain, checks every acceptance criterion, reviews code and logs, runs positive, negative and edge scenarios live, and gives a verdict: Done, Done with notes, Stays open, or Needs BA input. `ticket-ship` runs it after code review. |
-| `ttl` | | Time to live. Gives each agent its own small, isolated copy of Aruva (a lane) built from its worktree, next to one shared base stack, so many agents can run and test the app at once. One `lane` command claims a lane, builds only the repos you changed, seeds test accounts, logs in (admin TOTP included), takes screenshots through the real UI, runs scripted UI journeys (PDF upload → Course Foundation → approved foundation → Smart Syllabus) with numbered screenshots, and deletes everything afterwards. Aruva-specific; needs the local setup in `skills/ttl/references/setup.md`. |
-| `tth` | | Time to help. Lists every skill installed across Claude Code, Codex and Cursor, read from the real SKILL.md files and de-duplicated, with the name to type and what it does. Answers "which skill for this?" from the files, not from memory. |
-| `plain-talk` | | Explains any ticket, bug, PR or result in everyday language, as a story that opens with the name of the problem, told over a few turns with a check-in between each so you can follow along. Several tickets become one story. Name a skill or concept after it (`plain-talk ticket-ship`) and it explains it with a real-life example. |
+| `full-send` | "full send PROJ-123" | Does everything below in one go with nobody watching, and stays on the PR until it is merged. |
+| `ttp` | "ttp" | Time to plan. Picks or takes a ticket, reproduces the bug, researches with many sub-agents, and writes a checked plan. Then explains in simple words what is wrong, why, and how it will be fixed. |
+| `bug-reproduced` | (automatic) | Replays a bug step by step, saves the before screenshots and logs, writes a failing test and names the cause. |
+| `tts` | "tts" | Time to ship. Builds the plan with parallel sub-agents in one worktree, loops with `ttq` until it passes, opens the PR and updates Jira. |
+| `ttq` | "ttq" | Time to QA. Four code reviewers, a live run and a senior QA check of every acceptance criterion. Scores out of 100. |
+| `ttl` | "ttl" | Time to live. A private running copy of the app per agent, for screenshots, API calls and logs. Aruva-specific. |
+| `babysit-pr` | "babysit" | Watches a PR through CI and review, fixes real findings, resolves every comment, stays until merged. |
+| `council` | "council" | Gets a review from Grok, Claude Opus and GPT at medium effort, and loops until they agree. |
+| `modernize` | "modernize" | Rebases an old PR and decides if it should still exist. |
+| `ttjc` | "ttjc" + Jira link | Time to Jira comments. Explains the ticket, what each person is asking, and what to do next. |
+| `ttgc` | "ttgc" + PR link | Time to GitHub comments. Explains the PR, what each reviewer is asking, and what to do next. |
+| `tth` | "tth" | Time to help. Says how each skill works and, mid-chat, where the work stands and what to type next. |
+| `plain-talk` | "plain-talk" | Explains any ticket, bug or result as a short story in everyday words. |
+| `unslop` | (automatic) | The writing style for every reply, plan, commit, PR and Jira comment. |
+| `postwork` | (automatic) | Reviewer: checks finished work against its ticket. |
+| `ticket-prework-review` | (automatic) | Reviewer: checks a ticket and plan before building starts. |
 
-Nothing passes without a live test, and every PR carries proof that it works locally. Whatever you type after a skill name outranks the skill's own rules.
+## How they fit together
+
+The pipeline, in order. `full-send` runs the whole chain.
+
+```mermaid
+flowchart LR
+  P[ttp<br>plan] --> R[bug-reproduced<br>before proof] --> P
+  P --> S[tts<br>build]
+  S --> Q[ttq<br>4 reviewers + live QA]
+  Q -- findings --> S
+  Q -- score 100 --> L[ttl<br>after proof]
+  L --> C[tts close-out<br>PR + Jira]
+  C --> B[babysit-pr<br>until merged]
+```
+
+- `ttp` uses `bug-reproduced`, `ticket-prework-review` and `ttl`.
+- `tts` uses `ttq`, `ttl` and `babysit-pr`.
+- `ttq` uses `postwork` and `ttl`.
+- Everything uses `unslop`.
+
+## What each skill can touch
+
+A solid arrow means the skill changes that system. A dotted arrow means it only reads.
+
+```mermaid
+flowchart LR
+  subgraph Skills
+    ttp
+    br[bug-reproduced]
+    tts
+    ttq
+    ttl
+    bp[babysit-pr]
+    mod[modernize]
+    cou[council]
+    ttjc
+    ttgc
+    tth
+  end
+  subgraph Systems
+    J[(Jira)]
+    G[(GitHub)]
+    C[(Code worktree)]
+    A[(Running app and browser)]
+    M[(Other AI models)]
+  end
+  ttp -->|claim, status, comment| J
+  ttp -.->|search PRs| G
+  ttp -->|make worktree, failing test| C
+  br -.->|read history, add link| J
+  br -.-> G
+  br -->|failing test, local only| C
+  br -->|run, screenshot| A
+  tts -->|comment, screenshots, status, worklog| J
+  tts -->|push branch, open PR| G
+  tts -->|build and commit| C
+  ttq -.->|read requirements| J
+  ttq -.->|read only| C
+  ttq -->|live run| A
+  ttl -->|start, test, delete a private copy| A
+  bp -->|push fixes, reply, resolve| G
+  bp -->|fix code| C
+  bp -->|update comment| J
+  mod -->|rebase and update the PR branch| G
+  mod -.-> J
+  cou -.->|read only| C
+  cou -->|ask three models| M
+  ttjc -.->|read only| J
+  ttgc -.->|read only| G
+  tth -.->|read only| C
+```
+
+| Skill | Jira | GitHub | Code | Running app | Never does |
+|---|---|---|---|---|---|
+| `ttp` | Assigns the ticket to you, moves it to In Progress, posts the plan comment | Reads PRs | Makes the worktree, commits one failing test locally | Through `bug-reproduced` and `ttl` | Push, or change product code |
+| `bug-reproduced` | Reads tickets, links a repeat bug to the old one | Reads PRs and history | Commits a failing test locally | Runs it, takes before screenshots and logs | Push |
+| `tts` | Comments, uploads screenshots, moves to Code Review, logs time | Pushes the branch and the proof, opens the PR | Builds and commits inside the worktree | Through `ttq` and `ttl` | Merge, force-push, touch production |
+| `ttq` | Reads. Drafts bugs, files them only with your yes | Reads the diff | Reads only | Runs every scenario live | Edit code |
+| `ttl` | Nothing | Nothing | Reads the worktree to build from | Starts and deletes its own private copy | Touch another agent's copy or the shared stack |
+| `babysit-pr` | Posts the review-fix and merge updates | Pushes fixes, replies, resolves threads | Fixes what CI and reviewers found | Reruns the live steps a fix touches | Merge, unless you asked in clear words |
+| `modernize` | Reads the ticket | Updates the PR's own branch after a rebase | Rebases | Reruns checks | Merge, close, widen the scope |
+| `council` | Nothing | Nothing | Reads only | Nothing | Edit anything |
+| `ttjc` | Reads only | Nothing | Nothing | Nothing | Post without your yes |
+| `ttgc` | Reads the ticket summary | Reads only | Nothing | Nothing | Post, resolve or push without your yes |
+| `tth` | Nothing | Nothing | Reads the task files | Nothing | Change anything |
+
+Every skill stops and asks before these: a force-push or history rewrite, a database migration, anything on shared, staging or production systems, secrets, dependency upgrades, CI changes, and deleting tests.
+
+## What the pipeline promises
+
+- Requirements come only from words the BA wrote in Jira. Every decision is logged with its source.
+- Nothing passes without a live run. UI changes are proven with UI screenshots.
+- The PR and the Jira ticket both carry before and after screenshots, taken with the same steps.
+- You get updates in simple words: a progress table, what was just fixed and why, and what is being fixed now. Every 10 minutes by day, every hour in the evening, none overnight.
+- The chat is named after the ticket: `PROJ-123` for the pipeline, `JC PROJ-123` for Jira comments, `GC PROJ-123 #45` for GitHub comments.
+
+## Install
+
+```bash
+npx skills@latest add talibilat/tstack -g
+```
+
+Or by hand:
+
+```bash
+git clone https://github.com/talibilat/tstack
+cp -R tstack/skills/* ~/.claude/skills/   # Claude Code
+cp -R tstack/skills/* ~/.codex/skills/    # Codex
+```
 
 ## Setup
 
-On first run the skill creates `setup.md` next to its conventions file. It fills in your Jira site, account id and repos from your tools, and asks for the rest. That file stays on your machine.
+There is nothing to fill in before the first run. The skills ask for what they need, once:
 
-You need an Atlassian Jira connector in your agent, the `gh` CLI logged in, and git.
+- **Jira and repos.** On first run, `ttp` writes `skills/ttp/references/setup.md` from your Jira and git tools and asks for the rest. Add your BA's name there.
+- **Jira API token.** Needed only to upload screenshots to tickets. The skill asks for it once and saves it in `~/.config/tstack/jira.env`, outside the repo.
 
-## Optional companion skills
+## Requirements
 
-The reviewers and checks call these skills if you have them: `interrogate` (pstack), `postwork`, `ponytail-review`, `thermo-nuclear-code-quality-review`, `ticket-prework-review`. A missing reviewer shows as NOT RUN and blocks a score of 100 until you waive it.
+- An Atlassian Jira connector in your agent.
+- An authenticated [GitHub CLI](https://cli.github.com) (`gh`), and git.
+- `python3` for the progress board, the PR status script and the Jira upload.
+- `council` needs sub-agents on other providers' models. T3 Code does this with `delegate_task`.
+- `ttl` needs the local Aruva setup in `skills/ttl/references/setup.md`.
 
-Built for Claude Code. Codex, Cursor and other agents work too, with the tool swaps listed in `skills/ticket-plan/references/conventions.md`.
+`postwork` also reads Matt Pocock's `code-review` skill. That file is not in this repo. Copy it to `skills/postwork/references/matt-code-review.md`.
+
+Optional reviewers, used when installed: `interrogate` and `blast-radius` (pstack), `ponytail-review`, `thermo-nuclear-code-quality-review`, `grilling`, `diagnosing-bugs`, `tdd`. A missing reviewer shows as NOT RUN.
+
+## Make them yours
+
+These are starting points. Edit them. Whatever you type after a skill name outranks the skill's own rules, so "ttp PROJ-123, plan only" or "updates every 30 minutes" just works.
 
 ## License
 
-MIT
+[MIT](LICENSE)
