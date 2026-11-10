@@ -57,7 +57,7 @@ Done when the ticket file exists and every requirement you know of has a named s
 ## 4. Worktrees and baseline
 
 1. Choose the repos yourself. Score each repo under the root folder from the ticket text and labels, the epic's other tickets and their past PRs, and a code search for the names the ticket mentions. Ask only when no repo stands out.
-2. For each repo: `git -C <repo> fetch origin <default branch>`, then `git -C <repo> worktree add -b <branch> <root>/<repo>-worktrees/<KEY> origin/<default branch>`. A worktree for this key on an unmerged branch with only my commits is resumed as it is. Ask when the branch holds someone else's commits.
+2. For each repo: `git -C <repo> fetch origin <default branch>`, then `git -C <repo> worktree add -b <branch> <root>/<repo>-worktrees/<KEY> origin/<default branch>`. A worktree for this key on an unmerged branch with only my commits is resumed, after `sync-dev.sh` brings it up to date with dev. Ask when the branch holds someone else's commits.
 3. Run the install command from the conventions table inside the worktree (`npm ci`, `uv sync`, never an upgrade).
 4. Run test, lint, typecheck and build. Keep pass or fail, counts and the names of failing tests. Record failures that existed before this change so they are not blamed on it. Leave them unfixed.
 

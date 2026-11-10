@@ -86,7 +86,7 @@ Done when all four conditions hold on one commit.
 
 Run this on the final commit, after the loop ends.
 
-1. Follow `<KEY>-repro.md` exactly as `reproduce` did, in the same place and with the same account and data. For Aruva use the `lane` skill.
+1. Sync every repo with dev (`~/.agents/skills/lane/scripts/sync-dev.sh <worktree> ...`). If a worktree moved, rebuild the lane and run the baseline again. Then follow `<KEY>-repro.md` exactly as `reproduce` did, in the same place and with the same account and data. For Aruva use the `lane` skill.
 2. Save a proof file for every step into `.scratch/<KEY>-evidence/after/`, with the same file names as in `before/`. UI screenshots wherever the before proof is a UI screenshot. Save the logs for the same action, now clean.
 3. Write `.scratch/<KEY>-evidence/before-after.md`: one row per step with the before image, the after image and a one-line caption.
 4. Close every window and tab you opened, and give the lane back.

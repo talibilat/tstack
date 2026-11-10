@@ -17,7 +17,7 @@ Never test against production. Shared or staging systems need the user's OK firs
 
 1. Start with `.scratch/<KEY>-repro.md`. Replay its steps exactly as the before proof was taken: same place, same account, same data. Save each step's proof into `.scratch/<KEY>-evidence/after/` under the same file name as in `before/`.
 2. Then run the plan's Live test section: the other numbered steps, each with its action and expected result. If it is thin, write it now. Always include one nearby flow that must still work.
-3. Run on the final commit. Record `git -C <wt> rev-parse HEAD`. Start services in the background. Stop them afterward and check that the ports are free.
+3. Sync every repo with dev first (`~/.agents/skills/lane/scripts/sync-dev.sh <worktree> ...`), so a local copy is never behind. If a worktree moved, rebuild and run the baseline again. Run on the final commit. Record `git -C <wt> rev-parse HEAD`. Start services in the background. Stop them afterward and check that the ports are free.
 4. Compare each step with its expected result. Take a screenshot or save the output for each step. Save the logs for the changed action: backend and AI logs, the browser console and the network request.
 5. Write `.scratch/<KEY>-live-test.md`:
 

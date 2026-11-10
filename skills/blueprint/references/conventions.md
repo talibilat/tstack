@@ -240,6 +240,22 @@ Uploading screenshots to a ticket needs a Jira API token, because the Jira conne
 - Upload: `python3 -I ~/.agents/skills/blueprint/scripts/jira-attach.py <KEY> <files>`. Test the login: the same script with `--check`.
 - When the file is missing, ask once with `request_secret` (label "Jira API token", link `https://id.atlassian.com/manage-profile/security/api-tokens`, delivery `file`). Write the three values into the env file with one command that reads the secret file, run `--check`, and carry on. Never print the token or put it in chat, a ticket, a commit or a log.
 
+## Live environment
+
+A live environment is a running copy of the app. It is local (Docker, or a `lane` for Aruva) or the deployed dev environment, never production. Bugs are reproduced and changes are proven only there, never by reading code, a unit test or a mock.
+
+**A local copy is never behind dev.** Before you start, rebuild or test with any local copy, sync every repo it uses:
+
+```
+~/.agents/skills/lane/scripts/sync-dev.sh <worktree> [<worktree> ...]
+```
+
+It fetches `origin`, and rebases a clean worktree onto the latest default branch (`dev`). It leaves a worktree with uncommitted changes alone and aborts on a conflict, and either case needs the user. It never uses `git stash`.
+
+- Run it before `reproduce` starts the app, before every `lane up` and `lane rebuild`, before the live run in `inspect`, before the after proof in `ship`, and again before the PR opens. If it moved a worktree, rebuild the lane and run the baseline again.
+- Write the commits the copy was built from on the `Live environment` line of `<KEY>-repro.md` and in the live test file.
+- The shared base stack (`qa-dev`) holds the parser, extractor and PII masking that lanes borrow. If it runs older images than dev, say so. Never stop or recreate it without asking.
+
 ## Evidence
 
 Proof lives in `.scratch/<KEY>-evidence/`:

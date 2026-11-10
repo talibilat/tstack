@@ -24,7 +24,7 @@ Before and after are taken the same way: follow `.scratch/<KEY>-repro.md` step b
 1. **Check.** Run `lane doctor`. Every line must say `ok` (an `info` line about the shared network is fine). On a `FAIL`, follow `references/setup.md` and stop if you cannot fix it.
    Done when doctor prints no `FAIL`.
 
-2. **Claim a lane.** Pass the worktree of every repo your change touches. Repos you leave out run the base dev image.
+2. **Sync, then claim a lane.** First run `scripts/sync-dev.sh <worktree> ...` for every worktree, so the lane is never behind dev. If it reports a dirty worktree or a conflict, stop and ask. Then pass the worktree of every repo your change touches. Repos you leave out run the base dev image.
 
    ```
    lane up <TICKET-KEY> --be <uok-be worktree> --ai <uok-ai worktree> --fe <uok-fe worktree> --owner "<agent or chat name>"
@@ -45,7 +45,7 @@ Before and after are taken the same way: follow `.scratch/<KEY>-repro.md` step b
 
    A flow writes `steps.log` and numbered screenshots. A `FINDING` line is a real product result on that PDF (for example a blocking validation issue), not a tool failure: report it. The flow waives a blocking issue once and stops if validation still blocks, because choosing which candidates to reject needs a person. Resume a run with `--course <id> --from <step>`.
 
-   Accounts and seeded courses are in `references/accounts.md`. After you change code, run `lane rebuild N be|ai|fe` and test again.
+   Accounts and seeded courses are in `references/accounts.md`. After you change code, or after `sync-dev.sh` moves a worktree, run `lane rebuild N be|ai|fe` and test again.
    Done when every step of the ticket's live test has a result and a proof file.
 
 4. **Save proof** into the task's evidence folder, in the subfolder the table above names. UI screenshots are the proof for anything that shows in the UI. Save the logs for the same action beside them: `lane logs N api > <folder>/NN-api-log.txt`, and the same for the AI service when it is involved. `lane proof N <label>` gives a folder inside the lane if you need scratch space. Strip tokens, secrets and personal data from text proof.
