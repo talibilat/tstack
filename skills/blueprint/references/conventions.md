@@ -16,7 +16,7 @@ Shared by `blueprint`, `reproduce`, `ship`, `inspect` and `lane`. Read it once p
 
 `full-send` runs all six stages in one go and keeps the chat open until the PR is merged. Side skills: `council` (three models review a plan or a change), `modernize` (bring an old PR up to date), `explain-jira` and `explain-pr` (explain Jira and GitHub comments in simple words).
 
-A bug is never planned before it has been reproduced. `blueprint` stops at its reproduce step when `reproduce` says `Reproduced: no` or `already fixed`.
+A bug is never planned before it has been reproduced, and it is reproduced in the live environment only: a running copy of the app (a `lane` for Aruva), never by reading code, a unit test or production. `blueprint` stops at its reproduce step when `reproduce` says `Reproduced: no` or `already fixed`.
 
 Each skill starts the next one without asking. "just blueprint" stops after the plan. "build only" stops after the build. "just inspect" checks and reports without fixing.
 

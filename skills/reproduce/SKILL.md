@@ -19,6 +19,7 @@ Read the ticket, its comments and attachments, and the chat. Write `.scratch/<KE
 
 ```
 Reproduced: not yet
+Live environment: <lane number and commits, or how the app was run>
 Where: <lane URL, page or command>   Account and data: <role, fixture, file>
 | # | Action | Expected (correct behavior, with its source) | What the report says happens | Proof file name |
 ```
@@ -42,15 +43,15 @@ Done when `<KEY>-history.md` exists.
 
 ## 3. Reproduce it live, step by step
 
-Run the app from the current default branch and follow `<KEY>-repro.md` one step at a time. Check each step's result before taking the next.
+Reproduce in the live environment only: a running copy of the app, started from the current default branch. For Aruva that is a `lane`. For other apps, run the app from the worktree. Follow `<KEY>-repro.md` one step at a time and check each step's result before taking the next. Write the environment on the second line of `<KEY>-repro.md`, for example `Live environment: lane 2 from uok-be abc1234, uok-fe def5678`.
 
 - **UI first.** For Aruva use the `lane` skill: claim a lane built from the worktrees and drive the real UI. For other apps use the browser tools from the conventions file. You may use the user's computer and terminal freely for this.
-- **Terminal otherwise.** When the bug has no screen (API, worker, CLI, data), reproduce it with real calls and commands.
+- **Terminal otherwise.** When the bug has no screen (API, worker, CLI, data), reproduce it with real calls and commands against that same running app.
 - If an old regression test exists, run it and say why it did not catch this case.
 
 Try up to 3 different approaches or 30 minutes: another account or role, other data or file, another route to the same screen, a different browser, the exact commit the report names. Correct `<KEY>-repro.md` whenever the real steps differ from the report.
 
-Only a live run counts. The wrong behavior must happen in front of you, from a real run, call or command. The ticket text, a reading of the code and a passing or failing unit test alone do not make it reproduced.
+Only the live environment counts. The wrong behavior must happen in front of you in the running app. The ticket text, a reading of the code, a unit test, a mock and a static check never make it reproduced, and neither does production. If the live environment cannot be started (a lane will not come up, a key or service is missing), the result is `Reproduced: no` with that blocker as the reason. Never fall back to reading the code.
 
 Done when `Reproduced: yes` is written because the wrong behavior happened in front of you on the current default branch, or the timebox ran out and you go to step 4.
 
@@ -108,7 +109,7 @@ Set the first line of `<KEY>-repro.md` to `Reproduced: yes`. Reply to the caller
 
 ## Never
 
-- Never report `Reproduced: yes` from the ticket text, the code or a unit test alone. It must have happened live.
+- Never report `Reproduced: yes` from the ticket text, the code or a unit test alone. It must have happened in the live environment.
 - Never let the caller plan a bug that did not reproduce. Report `no` or `already fixed` with the reason.
 - Never keep a terminal screenshot as the only proof of a UI bug.
 - Never leave a browser window, tab or lane open.
