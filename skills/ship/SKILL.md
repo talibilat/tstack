@@ -20,7 +20,7 @@ Keep the user informed as the Progress board section of the conventions file say
    - All present: this ran after `blueprint`. Reuse them.
    - Plan missing: read `~/.agents/skills/blueprint/SKILL.md` and run it for this key up to the end of its step 8, then continue here.
    - Worktree archived: recreate it from the branch with `git worktree add <path> <branch>`.
-3. For a bug, open `<KEY>-repro.md`. Its first line must be `Reproduced: yes` and `before/` must hold the proof. Otherwise do not build: run `blueprint` for this key, which stops with a could-not-reproduce report when the bug will not reproduce.
+3. For a bug, open `<KEY>-repro.md`. Its first line must be `Reproduced: yes`, its second line must name the live environment, and `before/` must hold the proof. Otherwise do not build: run `blueprint` for this key, which stops with a could-not-reproduce report when the bug will not reproduce.
 4. Check the plan against the requirement documents and the knowledge file. A plan written before a requirement changed is replanned first.
 5. Recap the plan in about 5 lines, then start building at once.
 
