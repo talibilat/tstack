@@ -65,7 +65,7 @@ Done when each repo has a worktree and a baseline row.
 
 ## 5. Reproduce first (a hard gate)
 
-Run the `reproduce` skill when the task is a bug, or when the ticket or the chat shows an error or steps to reproduce. It checks the history, reproduces the problem step by step in the live environment (a running copy of the app on the current default branch), saves the before screenshots and logs, and returns one of three results in the first line of `.scratch/<KEY>-repro.md`:
+Run the `reproduce` skill when the task is a bug, or when the ticket or the chat shows an error or steps to reproduce. It checks the history, reproduces the problem step by step in the live environment (a running copy of the app: local Docker or a lane on the current default branch, or the deployed dev environment), saves the before screenshots and logs, and returns one of three results in the first line of `.scratch/<KEY>-repro.md`:
 
 | Result | What you do |
 |---|---|

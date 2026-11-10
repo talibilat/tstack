@@ -43,7 +43,7 @@ Done when `<KEY>-history.md` exists.
 
 ## 3. Reproduce it live, step by step
 
-Reproduce in the live environment only: a running copy of the app, started from the current default branch. For Aruva that is a `lane`. For other apps, run the app from the worktree. Follow `<KEY>-repro.md` one step at a time and check each step's result before taking the next. Write the environment on the second line of `<KEY>-repro.md`, for example `Live environment: lane 2 from uok-be abc1234, uok-fe def5678`.
+Reproduce in the live environment only: a running copy of the app. A local one counts: Docker, and for Aruva a `lane` (a private Docker copy) built from the current default branch. For other apps, start the app from the worktree with its own Docker or run command. A deployed dev environment also counts when the report was made there. Follow `<KEY>-repro.md` one step at a time and check each step's result before taking the next. Write the environment on the second line of `<KEY>-repro.md`, for example `Live environment: lane 2 from uok-be abc1234, uok-fe def5678`.
 
 - **UI first.** For Aruva use the `lane` skill: claim a lane built from the worktrees and drive the real UI. For other apps use the browser tools from the conventions file. You may use the user's computer and terminal freely for this.
 - **Terminal otherwise.** When the bug has no screen (API, worker, CLI, data), reproduce it with real calls and commands against that same running app.
@@ -51,7 +51,7 @@ Reproduce in the live environment only: a running copy of the app, started from 
 
 Try up to 3 different approaches or 30 minutes: another account or role, other data or file, another route to the same screen, a different browser, the exact commit the report names. Correct `<KEY>-repro.md` whenever the real steps differ from the report.
 
-Only the live environment counts. The wrong behavior must happen in front of you in the running app. The ticket text, a reading of the code, a unit test, a mock and a static check never make it reproduced, and neither does production. If the live environment cannot be started (a lane will not come up, a key or service is missing), the result is `Reproduced: no` with that blocker as the reason. Never fall back to reading the code.
+Only the live environment counts. The wrong behavior must happen in front of you in the running app. The ticket text, a reading of the code, a unit test, a mock and a static check never make it reproduced, and neither does production (never reproduce a bug on production). If the live environment cannot be started (Docker or a lane will not come up, a key or service is missing), the result is `Reproduced: no` with that blocker as the reason. Never fall back to reading the code.
 
 Done when `Reproduced: yes` is written because the wrong behavior happened in front of you on the current default branch, or the timebox ran out and you go to step 4.
 
