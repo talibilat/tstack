@@ -78,20 +78,20 @@ Fix every gap that is a plan problem. List the rest under Blockers.
 
 ## What I understood (the simple explanation)
 
-Show it in chat right after the plan, before any building starts. It is for a reader who does not write code. Use everyday words and real-life examples, as `plain-talk` does, with no analogy unless asked, and keep a technical term only when it is the point, with a few words on what it means. Brief, and complete enough that the reader could explain the problem to someone else.
+The first thing posted after planning. Run the `plain-talk` skill in brief mode to write it. It is for a reader who does not write code, and it is short: about 150 words in all, one or two sentences for each part below. Everyday words, a real example only when it fits in a sentence, no analogy unless asked, and a technical term only when it is the point, with a few words on what it means.
 
-1. **What exactly is wrong.** What a person sees, where, and how it differs from what should happen. Point to the before screenshot.
-2. **Why it happens.** The cause in plain words, one step at a time: what the app does, where it goes wrong, and why that produces what the person sees. One real-life example of the same kind of problem.
-3. **How I plan to fix it.** Each part of the fix as one line: what changes, and what that part is for.
-4. **What you will notice afterwards.** The visible result once it ships.
-5. **What could still go wrong.** One or two honest lines.
+1. **What is wrong.** What a person sees, and where. Point to the before screenshot.
+2. **Why it happens.** The cause, in the order things occur.
+3. **How I plan to fix it.** Each part of the fix as one short line, with what that part is for.
+4. **What could still go wrong.** One line.
 
 Example for a caching bug:
 
-> **What is wrong.** New chats are saved, but the chat list shows them empty (see `01-empty-chat.png`). They should show their messages straight away.
-> **Why.** The app keeps a saved copy of each chat so it does not have to fetch it every time (a cache). When a chat is saved, the app updates the database but forgets to refresh that copy, so the list reads the old, empty version. The same thing happens in a banking app that still shows yesterday's balance after you transfer money: the money moved, but the screen shows a stored number.
-> **The fix.** Part 1 refreshes the saved copy whenever a chat is saved, so the list always reads the latest version. Part 2 adds a test that saves a chat and checks the list, so this cannot come back unnoticed.
-> **What you will notice.** A new chat shows its messages at once.
-> **What could go wrong.** Two other screens read the same copy, so each one is checked in the live run.
+> **What is wrong.** New chats are saved, but the chat list shows them empty (`01-empty-chat.png`).
+> **Why.** The app keeps a stored copy of each chat so it loads fast. Saving a chat updates the database but not that copy, so the list reads the old one. A banking app that shows yesterday's balance after a transfer does the same thing.
+> **The fix.** Refresh the stored copy whenever a chat is saved, and add a test that saves a chat and checks the list.
+> **What could go wrong.** Two other screens read the same copy, so the live run checks both.
+
+Give more detail only when the user asks for it.
 
 When the explanation and the plan disagree, fix the plan.

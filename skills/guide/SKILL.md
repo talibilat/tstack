@@ -7,7 +7,7 @@ Never assume a requirement. Check Jira for the latest requirements before acting
 
 # guide
 
-Give directions. Answer from the chat, the files on disk and the skill files, never from memory. Change nothing: this skill only reads and explains.
+Give directions, and keep the answer short. Answer from the chat, the files on disk and the skill files, never from memory. Change nothing: this skill only reads and explains.
 
 Pick the branch that fits what the user asked. A bare `guide` in a chat with work in it means "Where am I". A bare `guide` in an empty chat means "How the pipeline works".
 

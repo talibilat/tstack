@@ -11,6 +11,8 @@ Explain a ticket and its comments to someone who has not read them. Read only: t
 
 Write as `~/.agents/skills/unslop/SKILL.md` says: everyday words, short sentences, and a real-life example where it helps. Use no analogy unless the user asks for one, as `plain-talk` does. Keep a technical term only when the user will need it, with a few words on what it means.
 
+Keep it short: a few sentences for what it is, a compact table for what they ask, and a short list for what to do next. Add detail only when the user asks.
+
 ## Steps
 
 1. **Rename the chat** to `JC <KEY>` (`t3_thread_update`, `rename`). Example: `JC ARPP-4372`.

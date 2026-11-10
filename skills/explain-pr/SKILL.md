@@ -11,6 +11,8 @@ Explain a pull request and its comments to someone who has not read them. Read o
 
 Write as `~/.agents/skills/unslop/SKILL.md` says: everyday words, short sentences, and a real-life example where it helps. Use no analogy unless the user asks for one, as `plain-talk` does. Keep a technical term only when the user will need it, with a few words on what it means.
 
+Keep it short: a few sentences for what it is, a compact table for what they ask, and a short list for what to do next. Add detail only when the user asks.
+
 ## Steps
 
 1. **Read the PR.** From the link, take the repo and the number.

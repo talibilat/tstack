@@ -125,10 +125,10 @@ Done when the plan check has no open plan problem, every grill question has an a
 
 Post in chat, in this order:
 
-1. Blockers and open questions, or "No blockers".
-2. The plan, trimmed to what a person needs: problem, approach, subparts, baseline, risks.
+1. **What I understood.** Run the `plain-talk` skill in brief mode on the task, the root cause and the plan, and post its answer first. It is about 150 words: what is wrong, why it happens, how it will be fixed. The template says how.
+2. Blockers and open questions, or "No blockers".
 3. The before proof: the screenshots from `before/`, each with a one-line caption.
-4. What you understood, as the template's simple explanation: what exactly is wrong, why it happens, and how you plan to fix it, part by part.
+4. The plan, trimmed to what a person needs: problem, approach, subparts, baseline, risks. Keep it to a short table or list.
 5. The progress board table.
 
 Post the "plan is ready" comment on the ticket, as the Jira updates section of the conventions file says.

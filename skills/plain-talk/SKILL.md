@@ -1,6 +1,6 @@
 ---
 name: plain-talk
-description: Explains any situation, ticket, bug, PR, skill or technical result in everyday language, with real-life examples and full detail, for a reader who does not work in tech. Names the problem first, then explains what happened, why and what comes next. Gives no analogy unless asked. Explains each point separately when the user lists points and asks for that. Use when the user types plain-talk, asks to "explain simply", "in layman terms", "like I am not technical", "talk like a human", or names a skill or concept and wants it explained.
+description: Explains any situation, ticket, bug, PR, skill or technical result in everyday language, with real-life examples, for a reader who does not work in tech. Short by default, full detail on request, and a brief mode other skills call. Names the problem first, then explains what happened, why and what comes next. Gives no analogy unless asked. Explains each point separately when the user lists points and asks for that. Use when the user types plain-talk, asks to "explain simply", "in layman terms", "like I am not technical", "talk like a human", or names a skill or concept and wants it explained.
 ---
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
@@ -21,7 +21,13 @@ A real-life example is a real situation of the same kind that people actually me
 - Give no analogy ("it is like a restaurant kitchen") until the user asks for one ("give me an analogy", "compare it to something"). When asked, give it, and say where it stops being true.
 - Pick an example that is true to the problem, specific, and one the reader has likely seen. Say what it shows. Do not decorate.
 
-## Give the full picture
+## Short by default
+
+Keep answers short. Give the most important points first, in a few sentences, and stop. Go into full detail only when the user asks for it ("tell me more", "explain in detail", "the full story").
+
+**Brief mode** is for when another skill calls this one for a quick explanation, such as the one after a plan. Write about 150 words at most: the problem named in a line, then one or two sentences for each part asked for. Keep the substance (the real cause, the real fix) and drop everything else. No tables, no multi-turn check-ins.
+
+## Give the full picture (when asked for detail)
 
 Cover what is needed, then stop. A ticket usually needs most of these, and a small question needs only one or two:
 
@@ -64,7 +70,7 @@ When the user lists several items and does not ask for them separately, group th
 
 ## Turns
 
-For a big topic, go one layer at a time and end with one short, natural question ("Want me to go into why it broke?"). Read the reply. If they follow, add the next layer. If they are confused, say it again with a different real-life example before adding anything new. When the topic is small, or the user wants it all at once, give it all in one go and skip the question. Length follows the topic: as long as it needs to be to be clear, and no longer.
+For a big topic, go one layer at a time and end with one short, natural question ("Want me to go into why it broke?"). Read the reply. If they follow, add the next layer. If they are confused, say it again with a different real-life example before adding anything new. When the topic is small, or the user wants it all at once, give it all in one go and skip the question. Length follows the request: short by default, and as long as it needs to be when the user asks for detail.
 
 ## Language
 
