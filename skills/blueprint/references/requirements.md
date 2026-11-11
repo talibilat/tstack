@@ -25,6 +25,8 @@ Keep `.scratch/<KEY>-decisions.md`. Every decision made while planning, building
 
 Kind is "requirement" (what the product must do, BA quote required) or "build choice" (how the code is done, code evidence required). Builders, reviewers and `inspect` all get this file's path.
 
+`blueprint/scripts/grounded.py check` reads this table and the Jira grilling table (`.scratch/<KEY>-reviews/grill.md`) and fails on a requirement with no source or quote, a build choice with no `file:line`, a grill answer with no quote, and a requirement that the grilling could not find in Jira.
+
 ## Find the requirement documents
 
 Follow the links from the ticket until you reach the source. Stop at 3 hops from the ticket for each branch.

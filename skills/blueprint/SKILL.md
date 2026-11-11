@@ -130,16 +130,37 @@ Done when every question the ticket and the chat raise has an answer with a sour
 3. Fill in the plan's Checklist: one line for each thing that was asked, pointing to the subpart that builds it and the check that proves it.
 4. Compare the plan estimate with the Jira estimate. If the plan is more than 1 hour over, say so under Blockers.
 
-Done when every checklist line maps to a subpart and every decision row has its backing.
+Run `python3 -I ~/.agents/skills/blueprint/scripts/grounded.py check <KEY> --stage decisions` before step 8. It must print PASS: a requirement decision with no ticket, page or attachment behind it and no quote is not allowed.
+
+Done when every checklist line maps to a subpart, every decision row has its backing, and the decisions check passes.
 
 ## 8. Check the plan
 
-Run both checks at once, then fix what they find.
+Run the plan check and the Jira grilling, then fix what they find.
 
-1. **Plan check.** The child described in the template reads the `ticket-prework-review` skill and pstack `blast-radius`, and scores the plan out of 100. Use that score to judge your own plan: below 90, fix the gaps and run the check again.
-2. **Grilling.** A second child reads the `grilling` skill, the plan, the decision log and the research files, and writes its 15 hardest questions to `.scratch/<KEY>-reviews/grill.md`. Answer every question from the decision log or the research. A question you cannot answer starts a new research agent, or becomes a Blocker.
+1. **Plan check.** A child reads the `ticket-prework-review` skill and pstack `blast-radius`, and scores the plan out of 100, as the template says. Below 90, fix the gaps and run it again.
+2. **Jira grilling.** A small question session, where the answers come only from Jira. Every decision about what the product must do is tested against what the BAs wrote.
 
-Done when the plan check has no open plan problem, every grill question has an answer or a Blocker, and every checklist line is ticked "planned".
+   1. **Write the questions.** You, or a child that has read the `grilling` skill, read the plan and the decision log and write 8 to 12 questions to `.scratch/<KEY>-reviews/grill-questions.md`. Ask one for each requirement decision and one for each risky assumption (edge cases, roles, limits, what must not change). Word each one neutrally, such as "What do the requirements say should happen when a course has no chapters?". Never include the plan's own answer or a hint of it.
+   2. **Start the answerer.** Start one fresh sub-agent (Sonnet medium) with the Atlassian tools, as the Agents section of the conventions file says. Give it only the ticket key, the paths of the questions file, the knowledge file and the output file `.scratch/<KEY>-reviews/grill.md`. Do not give it the plan, the decision log or any code. It answers under these rules:
+      - It answers only from Jira: the ticket, its comments, the parent chain, the epic and its related and linked tickets, Confluence pages, and attachments. It searches each of them for every question.
+      - Every answer gives a source (ticket key with the author and date, Confluence page with its version, or attachment name) and the exact quote. The BAs' words count most (see `setup.md`).
+      - When Jira does not say, the answer is `NOT IN JIRA`, with what was searched. It never guesses, never infers a rule, never reads code, and never fills a gap from common sense.
+      - When two sources disagree, it gives both and says which is newer.
+      - It writes a table `| Q | Question | Answer | Source | Quote | Decision | Plan agrees |` and leaves the last two columns for you.
+      If the child has no Jira tools, do this part yourself under the same rules and say so.
+   3. **Compare every answer with the plan.** For each row, fill in `Decision` (the decision numbers it checks) and `Plan agrees`:
+      - `yes`: the plan already does what the answer says.
+      - `changed`: the answer differs from the plan. Change the plan and the decision log to follow Jira, and keep the quote as the backing.
+      - `blocker`: the answer is `NOT IN JIRA`. List that question's id (`Q3`) under Blockers in the plan, and take any requirement decision that relied on it out of the plan or mark it as a question for the BA.
+   4. **A second round**, only for follow-up questions that the first answers raised. Two rounds at most.
+   5. Run the grounded check. It must print PASS:
+
+      ```
+      python3 -I ~/.agents/skills/blueprint/scripts/grounded.py check <KEY>
+      ```
+
+Done when the plan check has no open plan problem, `grounded.py check` prints `grounded: PASS`, and every checklist line is ticked "planned".
 
 ## 9. Show it and hand off
 
@@ -164,6 +185,7 @@ Then hand off:
 - Never offer or take a ticket assigned to someone else.
 - Never write a requirement that has no BA source.
 - Never write the plan before the research agents have returned.
+- Never keep a decision that is not grounded. A requirement rests on a BA quote in Jira. A build choice rests on a `file:line` or a research file. Anything else is changed or becomes a Blocker.
 - Never research, decide or plan a bug that has not reproduced. Stop and report why instead.
 - Never skip the before proof. It is skipped only when the user says "skip proof" in the call (see Proof in the conventions file).
 - Never create a worktree or a branch outside `<root>/worktrees/<KEY>/`, or by any way other than `worktree.sh add`.

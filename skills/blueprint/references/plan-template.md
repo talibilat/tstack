@@ -22,7 +22,7 @@ Requirements used: <document, version and date, one line each. Knowledge file pa
 Decision log: <path>   Research: <folder>   Before proof: <folder>
 
 ## Blockers and open questions
-<None, or a numbered list. Each item says who can unblock it.>
+<None, or a numbered list. Each item says who can unblock it. Every grilling answer that is NOT IN JIRA appears here by its id (for example `Q3`).>
 
 ## Problem
 <2 to 4 sentences in plain words.>

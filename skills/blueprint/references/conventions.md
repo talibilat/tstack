@@ -119,7 +119,7 @@ These skills call other skills. Find one by looking for `<name>/SKILL.md` under 
 | Bug repro and before proof | `reproduce` (same repo) | Do its steps by hand |
 | The annotated before and after picture, and the check against the requirements | `proof` (same repo) | Not optional. Install it |
 | Live run and screenshots for Aruva | `lane` (same repo) | Use the browser tools or a real run |
-| Plan grilling | `grilling` | Write the hard questions yourself |
+| Plan grilling (the questions) | `grilling` | Write the hard questions yourself |
 | Plan check | `ticket-prework-review`, pstack `blast-radius` | Skip that part and say so |
 | Bug repro | `diagnosing-bugs`, `tdd` | Do the loop by hand |
 | PR watch | `babysit` (same repo) | Follow its steps by hand |

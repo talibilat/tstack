@@ -127,7 +127,7 @@ Every skill stops and asks before these: a force-push or history rewrite, a data
 
 ## What the pipeline promises
 
-- Requirements come only from words the BA wrote in Jira. Every decision is logged with its source.
+- Requirements come only from words the BA wrote in Jira. Every decision is logged with its source, and a sub-agent that may answer only from Jira grills the plan. A script fails any decision that is not grounded.
 - Nothing passes without a live run. UI changes are proven with UI screenshots.
 - A bug is reproduced first, in Docker or a lane, in a visible Chrome window. If it will not reproduce, the agent works on the blocker for up to 3 rounds, then reports it and stops. No plan is made.
 - The before and after proof is mandatory. A script checks it at each stage, builds one annotated before and after picture per step (changes circled and numbered, what was asked written on it), and checks the images are on the Jira ticket and in every PR. Only you can skip it, by saying "skip proof".
