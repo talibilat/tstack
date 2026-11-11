@@ -13,6 +13,17 @@ One picture per step that a reviewer can read in ten seconds: the bug on the lef
 
 Read `~/.agents/skills/blueprint/references/conventions.md` first (Proof is mandatory, Live environment, Evidence). The tool is `~/.agents/skills/proof/scripts/pair.py`, called `pair.py` below, always run as `python3 -I`. Evidence lives in `.scratch/<KEY>-evidence/` (`before/`, `after/`, `compare/`) and the step list in `.scratch/<KEY>-proof.json`.
 
+## To-do list
+
+Before the first step, make a temporary to-do list for the mode you are in, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new proof --key <KEY> "Run pair.py init" "Write looking-at and asked for each step" "Capture the before pictures" "Render the left half" "Check the before half is COMPLETE"
+python3 -I ~/.agents/skills/guide/scripts/todo.py new proof --key <KEY> "Sync with dev" "Capture the after pictures" "Find every change with diff" "Circle and number every change" "Judge each step against what was asked" "Render and look at every picture" "Check the proof is COMPLETE"
+```
+
+Use the first line for `before` mode and the second for `after` mode. Tick each item with its evidence (`todo.py tick proof --key <KEY> N --note "<proof>"`), mark a stuck one with `todo.py block`, and show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## The two modes
 
 | Mode | Called by | When | What it does |

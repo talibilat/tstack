@@ -13,6 +13,16 @@ Stay with a PR until it is merged. Review bots and people both leave useful comm
 
 Input: a PR link or number. Read `~/.agents/skills/blueprint/references/conventions.md` for the git identity, the Jira rules and the evidence rules.
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new babysit --key <KEY> --from ~/.agents/skills/babysit/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick babysit --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## 1. Look at the PR now
 
 ```

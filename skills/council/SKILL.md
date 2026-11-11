@@ -9,6 +9,16 @@ Never assume a requirement. Check Jira for the latest requirements before acting
 
 Three models that were trained by different companies make different mistakes. Where all three agree, the answer is probably right. Where they disagree, look closer.
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new council --key <KEY> --from ~/.agents/skills/council/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick council --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## The members
 
 All three run at medium effort. If the user names other members or another effort, use those.

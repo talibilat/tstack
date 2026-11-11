@@ -21,6 +21,16 @@ flowchart LR
 
 This skill only reports. It never edits project code or the ticket, and it writes no report files. Throwaway proof tests and scripts go in the scratchpad, a temp folder or a throwaway worktree, and you delete them when done.
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new postwork --key <KEY> --from ~/.agents/skills/postwork/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick postwork --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## Mandatory standards and spec review
 
 Read `references/matt-code-review.md` in full for every review. It contains Matt Pocock's complete code review skill, including its standards sources and code smell baseline. Apply both the Standards and Spec axes alongside the existing safety, bug and scope checks. Respect documented repo standards and treat smells as judgement calls. Cite the exact standard or requirement and evidence for each finding. Report Standards and Spec separately, with a count and worst finding for each. Do not merge or rerank the axes.

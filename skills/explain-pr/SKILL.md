@@ -13,6 +13,16 @@ Write as `~/.agents/skills/unslop/SKILL.md` says: everyday words, short sentence
 
 Keep it short: a few sentences for what it is, a compact table for what they ask, and a short list for what to do next. Add detail only when the user asks.
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new explain-pr --key <KEY> --from ~/.agents/skills/explain-pr/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick explain-pr --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## Steps
 
 1. **Read the PR.** From the link, take the repo and the number.

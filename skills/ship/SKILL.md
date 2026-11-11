@@ -15,6 +15,16 @@ First read `~/.agents/skills/blueprint/references/conventions.md`. Read `~/.agen
 
 Keep the user informed as the Progress board section of the conventions file says. Before each piece of work, record what you are fixing and why with `progress.py now`. Post an update (the table plus a few simple sentences: this part is fixed, this is why, now I am fixing that) whenever `progress.py due <KEY>` says "due".
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new ship --key <KEY> --from ~/.agents/skills/ship/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick ship --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## 0. Get ready
 
 1. Take the key from the call or from the chat. No key and plain instructions means standalone mode.

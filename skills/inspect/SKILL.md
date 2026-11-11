@@ -21,6 +21,16 @@ The gate has five checks. Each has its own row on the progress board.
 | Reviewer: thermo-nuclear | Strict maintainability | `references/review-loop.md` |
 | QA validation and live run | Every acceptance criterion, real scenarios in the running app, logs | Sections 2 to 5 below, `references/live-test.md` |
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new inspect --key <KEY> --from ~/.agents/skills/inspect/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick inspect --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## Before you start
 
 Read these. Paths are under `~/.agents/skills/`.

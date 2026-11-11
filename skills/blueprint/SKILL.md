@@ -15,6 +15,16 @@ Understand the task, prove the problem, research it, and write a plan that no bu
 
 First read `~/.agents/skills/blueprint/references/conventions.md`. It holds the pipeline order, the Jira ids, repos, naming, the progress board, the evidence folders, the agent rules and the ask-first list. The user's message outranks everything here (see "Your message comes first" in that file). If you are not Claude Code inside T3, read its "Using these skills from another agent" table and swap the tools as it says.
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new blueprint --key <KEY> --from ~/.agents/skills/blueprint/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick blueprint --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## 1. Find the task
 
 Read the user's message and the whole chat above it. Take the first row that fits.

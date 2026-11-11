@@ -15,6 +15,16 @@ Read `~/.agents/skills/blueprint/references/conventions.md` first. If `blueprint
 
 Update the `repro` row of the progress board after each step.
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new reproduce --key <KEY> --from ~/.agents/skills/reproduce/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick reproduce --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## 1. Write the repro steps
 
 Read the ticket, its comments and attachments, and the chat. Write `.scratch/<KEY>-repro.md`. Its first line is the result, `Reproduced: not yet` for now. Steps 3 and 4 set it to `yes`, `no` or `already fixed`.

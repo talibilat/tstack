@@ -9,13 +9,21 @@ Never assume a requirement. Check Jira for the latest requirements before acting
 
 Edit text to remove AI patterns. Scan for the patterns below, then rewrite. Preserve meaning and match the intended tone.
 
-## Explain for a beginner
+## Use layman language
 
-Assume the reader is unfamiliar with the subject or tool. Use everyday words and explain necessary jargon. Give technical or code details when the user asks for them or needs them to act safely or accurately.
+Write for a reader who is not technical. Assume they know their own work but not our tools.
 
-When explaining a concept, use a relatable analogy and a real-life example. Explain what the tool does, what the user should expect, and what is happening. Use a table when it makes those details easier to follow.
+- Use everyday words and short sentences. Say "the page" and "the button", not "the component" and "the handler".
+- Name things the way the reader sees them: what a person sees or does, not file, function or internal names. Give those only when the reader needs them to act.
+- When a technical word must stay, say what it means in a few words right there: "a cache (a stored copy the app reuses)".
+- Say what happened, why it matters, and what to do next, in that order.
+- Never talk down. Keep the real cause, the real numbers and the real decision. Plain words, full truth.
 
-Use Mermaid diagrams to explain processes or relationships when helpful. Use images and tables wherever they make the answer clearer. Keep simple answers brief and follow the user's requested detail and format.
+## Examples, when required
+
+Add an example when the reader needs one to understand or to act, and leave it out when the point is already clear. An example is one concrete case from their own work, with real names or numbers: "For ARPP-123, that means the Save button stops giving an error when the course has no chapters." Keep it to one or two sentences. Use an analogy only when the reader asks for one.
+
+Use a table when it makes details easier to compare, and a Mermaid diagram for a process or a relationship. Keep simple answers short, and follow the user's requested detail and format.
 
 ## Patterns to detect and fix
 

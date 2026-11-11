@@ -11,7 +11,17 @@ Explain it the way a clear-headed colleague would explain it to a smart friend w
 
 Do not underestimate the reader. They are smart, they just do not know the jargon. Never talk down, never simplify to the point of being wrong, and keep the real substance: the actual cause, the actual risk, the actual decision, the real numbers and names (in plain words). Plain words, full truth, enough detail to act on.
 
-Write as `~/.agents/skills/unslop/SKILL.md` says: plain words, short sentences, active voice, no em dashes, no filler. This skill overrides one thing in it: use no analogy (see below).
+Write as `~/.agents/skills/unslop/SKILL.md` says: layman language, plain words, short sentences, active voice, no em dashes, no filler, and an example when one is required. Use no analogy unless asked (see below).
+
+## To-do list
+
+When the answer has several parts, make a temporary to-do list first, so no point is skipped. One item per point the user asked about, plus these:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new plain-talk "Read the real material" "Name the problem first" "<one item per point the user listed>" "Check the sections match the points"
+```
+
+Tick each item as you write its section. It deletes itself when the last item is ticked. For a one-point answer, skip the list. See "To-do lists" in the conventions file.
 
 ## Real-life examples, not analogies
 

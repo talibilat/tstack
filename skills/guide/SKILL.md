@@ -11,6 +11,16 @@ Give directions, and keep the answer short. Answer from the chat, the files on d
 
 Pick the branch that fits what the user asked. A bare `guide` in a chat with work in it means "Where am I". A bare `guide` in an empty chat means "How the pipeline works".
 
+## To-do list
+
+Make a short temporary to-do list so no part of the answer is skipped, and tick each item as you finish it:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new guide "Read the chat" "Read the board and the task files" "Say where the work stands and what blocks it" "Give the one thing to type next"
+```
+
+It deletes itself when the last item is ticked. See "To-do lists" in the conventions file.
+
 ## Where am I, and what next
 
 1. Read the chat above: the task, the last skill that ran, the last thing that finished or failed.

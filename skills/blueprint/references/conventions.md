@@ -10,6 +10,7 @@ Be strict and vigilant. These apply to every skill, every agent and every sub-ag
 - **Never change the system to get past it.** Do not edit a skill, a gate script, the progress board, a verdict or a proof file to make a check pass. Do not run a command only to print PASS. Never fake an output.
 - **Evidence for every Done.** A Done condition is met only when you have pasted the command output or opened the file that shows it. "I believe it passed" is not evidence.
 - **Check where you are.** Before and after each batch of work, run `git status` in each worktree. Work only in the task folder `<root>/worktrees/<KEY>/<short>`, on the task branch, never on `dev` or `main`. Do not edit outside the task folder, the `.scratch` task files and the lane.
+- **Keep your to-do list.** Make it before step 1, tick items with evidence, and never leave it behind (see To-do lists).
 - **Re-read the Never list** of the skill you are in at every stage boundary.
 - **Only the user can waive a rule**, by naming it in the call.
 - **The progress board enforces the order.** `progress.py set` refuses to advance a stage while an earlier stage is not done.
@@ -202,6 +203,17 @@ Use sub-agents freely. Research, review and building all go faster and deeper wi
 - Never poll agents. Start them, then end the turn. Their completion wakes the chat. PR and CI watching follows the `babysit` skill.
 - Replace a failed agent once with a fresh agent plus a 5-line note on what failed and what is done. A second failure on the same piece stops the work and asks the user.
 
+## To-do lists
+
+Every skill makes a temporary to-do list before its first step, so nothing is forgotten. The tool is `python3 -I ~/.agents/skills/guide/scripts/todo.py` (called `todo.py`), and `--from <SKILL.md>` fills the list from the skill's own steps.
+
+- Tick an item only when its Done condition is met, and write the evidence in `--note`. Never tick a step you skipped or did not finish.
+- Write every note, blocker and update line as `unslop` says, in layman language. A blocker says what is stuck, why, and what would unblock it, for example `block 4 "Docker will not start. It needs more free memory. Close a heavy app or ask me to free it."`.
+- Mark a stuck item with `todo.py block N "<why>"`. A blocked item stays on the list, is shown as BLOCKED, and the list cannot finish until it is cleared.
+- Add a step you discover later (an extra repo, a follow-up) with `todo.py add`.
+- When the last item is ticked, the list deletes itself. A list that is left over means work is left over.
+- `progress.py show <KEY>` prints the to-do list of every skill running for the task, under the stage table.
+
 ## Progress board
 
 One board per task shows how far every stage is. The command is `python3 -I ~/.agents/skills/guide/scripts/progress.py`, called `progress.py` below. Run it from the chat's project folder, or pass `--dir <path to .scratch>`.
@@ -221,7 +233,7 @@ Set a stage to 100% only when its Done condition holds.
 
 Before each piece of work, record it: `progress.py now <KEY> "<what I am fixing or checking>" --why "<why, in simple words>"`. The record is the trail of every part of the work and the reason for it.
 
-An update is the output of `progress.py show <KEY>` (the table, what was done since the last update and why, what is being done now and why) plus 2 or 3 short sentences in everyday words (the `plain-talk` style), such as "The save button was sending the old course id. I changed it to read the id from the open page. Now I am checking that the list refreshes after saving." No jargon without a short explanation.
+An update is the output of `progress.py show <KEY>` (the stage table, what was done since the last update and why, what is being done now and why, then the to-do list of each running skill with what is left and the blockers) plus 2 or 3 short sentences in everyday words (the `plain-talk` style), such as "The save button was sending the old course id. I changed it to read the id from the open page. Now I am checking that the list refreshes after saving." No jargon without a short explanation.
 
 When to post one, by the local clock. `progress.py due <KEY>` applies these rules:
 

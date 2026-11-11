@@ -23,6 +23,16 @@ The pipeline uses a lane three times, and each use follows the steps below:
 
 Before and after are taken the same way: follow `.scratch/<KEY>-repro.md` step by step, with the same account and data.
 
+## To-do list
+
+Before the first step, make a temporary to-do list from this skill's steps, so nothing is forgotten:
+
+```
+python3 -I ~/.agents/skills/guide/scripts/todo.py new lane --key <KEY> --from ~/.agents/skills/lane/SKILL.md
+```
+
+Leave out `--key` when the task has no key. Tick each item when its Done condition is met, with the evidence: `todo.py tick lane --key <KEY> N --note "<proof>"`. Mark a stuck item with `todo.py block`, and add a step you find later with `todo.py add`. Show the list with every update. When the last item is ticked, the list deletes itself. See "To-do lists" in the conventions file.
+
 ## Steps
 
 1. **Check.** Run `lane doctor`. Every line must say `ok` (an `info` line about the shared network is fine). On a `FAIL`, follow `references/setup.md` and stop if you cannot fix it.

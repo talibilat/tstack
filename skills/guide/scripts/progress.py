@@ -21,6 +21,7 @@ Update schedule, by the local clock, unless `every` set another interval:
   00:00 to 07:00   no updates (the work continues)
 """
 import argparse
+import importlib.util
 import json
 import sys
 import time
@@ -240,9 +241,21 @@ def story(data):
     return "\n".join(lines)
 
 
+def todo_lists(args):
+    """The to-do lists of every skill running for this task, drawn by todo.py."""
+    spec = importlib.util.spec_from_file_location("todo", Path(__file__).with_name("todo.py"))
+    todo = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(todo)
+    out = []
+    for f in sorted(Path(args.dir).glob(f"todo-*-{args.key}.json")):
+        out.append(todo.render(json.loads(f.read_text())))
+    return "\n\n".join(out)
+
+
 def cmd_show(args):
     data = load(args)
-    print(table(data) + story(data))
+    extra = todo_lists(args)
+    print(table(data) + story(data) + (("\n\n" + extra) if extra else ""))
     data["last_shown"] = time.time()
     write(args, data)
 
