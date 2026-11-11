@@ -31,3 +31,11 @@ A repo missing from this table: the skill reads its README and scripts, asks you
 
 - Git author name and email for commits. Use your GitHub noreply address if you keep your email private.
 - GitHub account for pushes and PRs.
+
+## Short names
+
+The folder name of each repo's worktree inside `<root>/worktrees/<KEY>/`, for example `fe`, `be` and `ai`:
+
+| Repo | Short name |
+|---|---|
+| `<repo>` | `<short>` |

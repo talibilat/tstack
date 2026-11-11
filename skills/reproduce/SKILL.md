@@ -5,6 +5,8 @@ description: Reproduce a bug before any plan is written. Checks whether it was w
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
 
+Be strict and vigilant. Do only what this skill says, in its order, and never step outside the system (see System rules in the conventions file).
+
 # reproduce
 
 See the bug with your own eyes, and keep the proof. A bug that has not happened in front of you is not reproduced, and nothing gets planned on it. The before proof you save here is half of the before and after comparison that goes to Jira and GitHub, so it is the most important output of this skill. The before screenshots taken here are shown next to the after screenshots in the PR and in Jira, so both must come from the same steps.

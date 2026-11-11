@@ -8,6 +8,7 @@ update they post in chat.
   progress.py init  <KEY> [--dir .scratch]
   progress.py set   <KEY> <stage> <done> <total> [--note TEXT]
   progress.py skip  <KEY> <stage> [--note TEXT]
+  progress.py catchup <KEY> <stage> --why TEXT   resume mid-way: mark every earlier stage done
   progress.py now   <KEY> "<what I am doing>" --why "<why, in simple words>"
   progress.py show  <KEY>            prints the update and restarts the update timer
   progress.py due   <KEY>            says whether an update is due right now
@@ -94,11 +95,46 @@ def stage_or_exit(name):
     return name
 
 
+# The order is enforced. A stage may advance only when the stages it needs are finished or skipped.
+# (stage, minimum steps of that stage that must already be done)
+INSPECT = ["inspect-interrogate", "inspect-postwork", "inspect-ponytail", "inspect-thermo", "inspect-qa"]
+NEEDS = {
+    "repro": [("blueprint", 4)],  # reproduce is step 5 of blueprint
+    "ship-build": [("blueprint", None), ("repro", None)],
+    "lane-after": [(i, None) for i in INSPECT],
+    "ship-close": [("lane-after", None)],
+    "ship-merge": [("ship-close", None)],
+}
+NEEDS.update({i: [("ship-build", None)] for i in INSPECT})
+
+
+def blocker(data, stage, new_done):
+    """The reason this stage may not advance yet, or None."""
+    if new_done <= data["stages"][stage]["done"]:
+        return None  # going back or staying put is always allowed
+    for need, minimum in NEEDS.get(stage, []):
+        e = data["stages"][need]
+        if e["skipped"]:
+            continue
+        if minimum is None and e["done"] < e["total"]:
+            return f"{need} is not finished ({e['done']} of {e['total']}). Finish it first"
+        if minimum is not None and e["done"] < minimum:
+            return f"{need} has only done {e['done']} step(s), and {stage} starts after step {minimum}"
+    if stage == "blueprint" and new_done > 5:  # planning follows the reproduce gate
+        e = data["stages"]["repro"]
+        if not e["skipped"] and e["done"] < e["total"]:
+            return f"repro is not finished ({e['done']} of {e['total']}). A bug is not planned before it reproduces"
+    return None
+
+
 def cmd_set(args):
     data = load(args)
     stage = stage_or_exit(args.stage)
     if args.total < 1 or not 0 <= args.done <= args.total:
         sys.exit("done must be between 0 and total, and total at least 1")
+    reason = blocker(data, stage, args.done)
+    if reason:
+        sys.exit(f"BLOCKED: {stage} cannot advance. {reason}.")
     entry = data["stages"][stage]
     entry.update(done=args.done, total=args.total, skipped=False)
     if args.note is not None:
@@ -114,6 +150,19 @@ def cmd_skip(args):
     entry["note"] = args.note or "skipped"
     save(args, data)
     print(f"{args.stage}: skipped")
+
+
+def cmd_catchup(args):
+    data = load(args)
+    stage = stage_or_exit(args.stage)
+    for sid in IDS[: IDS.index(stage)]:
+        e = data["stages"][sid]
+        if not e["skipped"]:
+            e["done"] = e["total"]
+    entry = {"at": time.time(), "what": f"Resumed at {stage}: earlier stages marked done", "why": args.why}
+    data.setdefault("log", []).append(entry)
+    save(args, data)
+    print(f"everything before {stage} is marked done")
 
 
 def cmd_now(args):
@@ -245,6 +294,9 @@ def main():
     sp = add("skip", cmd_skip)
     sp.add_argument("stage")
     sp.add_argument("--note")
+    sp = add("catchup", cmd_catchup)
+    sp.add_argument("stage")
+    sp.add_argument("--why", required=True)
     sp = add("now", cmd_now)
     sp.add_argument("what")
     sp.add_argument("--why")

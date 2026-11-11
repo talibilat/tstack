@@ -5,6 +5,8 @@ description: Builds the annotated before and after picture for a bug fix or chan
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
 
+Be strict and vigilant. Do only what this skill says, in its order, and never step outside the system (see System rules in the conventions file).
+
 # proof
 
 One picture per step that a reviewer can read in ten seconds: the bug on the left, the fix on the right, every change circled and numbered, a line saying what is being looked at and what was asked, and a verdict. It is built in two halves, at two different times.

@@ -5,6 +5,8 @@ description: Takes a ticket, a bug or a request all the way to a merged PR in on
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
 
+Be strict and vigilant. Do only what this skill says, in its order, and never step outside the system (see System rules in the conventions file).
+
 # full-send
 
 The user said "full send" because they are not watching this chat. You own the work from where it stands now until the PR is merged and Jira is up to date. Use it only when the user asked for it in clear words.
@@ -33,7 +35,7 @@ It does not allow the items on the "Ask first" list, a merge, or anything touchi
    Done when CI is green, nothing is unresolved, and the ticket is in Code Review with a worklog.
 6. **Stay until merged.** Keep the watch running. Come back for every new comment, failed check or conflict. Never merge the PR yourself, unless the user wrote "full send and merge" and the repo's rules allow it.
    Done when GitHub reports the PR as merged.
-7. **Finish.** Post the last Jira update, stop the watch, and report in chat: the PR link, the merge commit, the before and after proof, the score, the hours logged, and each decision you made for the user.
+7. **Finish.** `babysit` archives the whole task folder to `archived-worktrees/<KEY>/`. Post the last Jira update, stop the watch, and report in chat: the PR link, the merge commit, the before and after proof, the score, the hours logged, and each decision you made for the user.
 
 ## Staying alive
 

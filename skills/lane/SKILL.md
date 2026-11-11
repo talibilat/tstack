@@ -3,6 +3,8 @@ name: lane
 description: Gives each agent its own small, isolated copy of Aruva (a lane) built from its worktree, so many agents can run the app at once, test it in the browser, over the API and in the terminal, and save before and after screenshots and logs. Use when the user types lane, or when reproduce, inspect or ship needs to reproduce, live test, demo or screenshot an Aruva change.
 ---
 
+Be strict and vigilant. Do only what this skill says, in its order, and never step outside the system (see System rules in the conventions file).
+
 # lane
 
 A **lane** is one agent's private Aruva: its own database, Redis, Qdrant, Neo4j, backend, AI service and frontend, on its own ports. The heavy stateless services (document parser, content extractor, PII masking) are shared from the always-on base stack. Many agents can each hold a lane at once without touching each other's data, ports or containers.
@@ -26,7 +28,7 @@ Before and after are taken the same way: follow `.scratch/<KEY>-repro.md` step b
 1. **Check.** Run `lane doctor`. Every line must say `ok` (an `info` line about the shared network is fine). On a `FAIL`, follow `references/setup.md` and stop if you cannot fix it.
    Done when doctor prints no `FAIL`.
 
-2. **Sync, then claim a lane.** First run `scripts/sync-dev.sh <worktree> ...` for every worktree, so the lane is never behind dev. If it reports a dirty worktree or a conflict, stop and ask. Then pass the worktree of every repo your change touches. Repos you leave out run the base dev image.
+2. **Sync, then claim a lane.** First run `scripts/sync-dev.sh <worktree> ...` for every worktree, so the lane is never behind dev. If it reports a dirty worktree or a conflict, stop and ask. Then pass the worktree of every repo your change touches, from the task folder (`<root>/worktrees/<KEY>/be`, `.../ai`, `.../fe`). Repos you leave out run the base dev image.
 
    ```
    lane up <TICKET-KEY> --be <uok-be worktree> --ai <uok-ai worktree> --fe <uok-fe worktree> --owner "<agent or chat name>"

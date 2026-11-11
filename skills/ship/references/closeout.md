@@ -15,7 +15,7 @@ Evidence is in `.scratch/<KEY>-evidence/`: `before/`, `after/` under the same fi
 
 Publish the images on an evidence branch. It shares no history with the code, so it can never be merged by accident.
 
-1. `git -C <repo> worktree add --orphan -b evidence/<KEY> <root>/<repo>-worktrees/evidence-<KEY>`
+1. `git -C <repo> worktree add --orphan -b evidence/<KEY> <root>/worktrees/<KEY>/_evidence-<short>` (the leading underscore keeps the archive step from moving it)
 2. In that folder: `mkdir -p <KEY>/before <KEY>/after <KEY>/compare`, copy the images in, then `git add -A` and commit with the identity from `setup.md`.
 3. `git push -u origin evidence/<KEY>`, then `git worktree remove` the folder.
 4. Image links look like `https://github.com/<org>/<repo>/blob/evidence/<KEY>/<KEY>/compare/<file>?raw=true`, and the same under `before/` and `after/`.
@@ -85,13 +85,9 @@ It uploads every comparison image, and the logs as `before-<name>` and `after-<n
 
 If the ticket's own report used UI screenshots, the comment's images are UI screenshots of the same screens.
 
-## 3. Archive, then delete the worktree
+## 3. Keep the task folder
 
-1. Create `<root>/archived-worktrees/<KEY>/`.
-2. Write `archive.md` there with: the repos, branches and PR links, the last commit SHA per repo, the commands to recreate each checkout (`git worktree add <path> <branch>`), the repro test path, the review scores, active hours and the Jira estimate.
-3. Copy `<KEY>-ticket.md`, `-plan.md`, `-reviews.md`, `-timeline.md`, `-live-test.md`, `-history.md` (if it exists), `<KEY>-reviews/` and `<KEY>-evidence/` into the archive folder.
-4. `git -C <repo> worktree remove <path>`. If it refuses, run `git -C <path> status --short`. Use `--force` only when the output lists nothing but ignored files such as `node_modules`.
-5. Keep the branch. Never delete a remote branch.
+Do not archive, move or delete anything here. The worktrees stay in `<root>/worktrees/<KEY>/`, because `babysit` needs them to fix CI and answer comments. `babysit` archives the whole task folder after every PR of the task is merged.
 
 ## 4. Babysit the PR
 
@@ -116,7 +112,7 @@ It must print `publish check: PASS`. Fix what it names, then run it again. Do no
    - `started` is the `claim` timestamp.
    - `commentBody` is 2 to 4 lines: what changed, the PR links and how it was tested.
 4. Post the Jira update for this milestone (see Jira updates in the conventions file).
-5. Tell the user in chat: ticket key, PR links, combined score, hours logged and the archive path. Keep watching.
+5. Tell the user in chat: ticket key, PR links, combined score and hours logged. Keep watching.
 
 ## 6. Stay until merged
 

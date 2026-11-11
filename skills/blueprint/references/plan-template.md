@@ -7,6 +7,13 @@ The plan lives in `.scratch/<KEY>-plan.md`. The same text is shown in chat. Bloc
 ```
 # <KEY> plan: <ticket summary>
 
+## Task folder and worktrees (the first thing to do)
+Folder: <root>/worktrees/<KEY>/
+| Repo | Worktree | Branch | Base | Status |
+|---|---|---|---|---|
+| <repo> | <KEY>/<short> | <branch> | origin/<default branch> | created, clean, baseline run |
+A repo the plan needs that has no row here is added to this folder with worktree.sh before the plan is finished. Everyone works only in these worktrees.
+
 Repeat bug: no            (yes when reproduce found earlier work. Then fill in the two sections below)
 Budget: <estimate or 4h>   Plan estimate: <hours>   Jira estimate: <hours or none>
 Repos: <repo list>

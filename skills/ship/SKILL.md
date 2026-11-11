@@ -5,6 +5,8 @@ description: Builds a planned task in its worktree with parallel sub-agents, cal
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
 
+Be strict and vigilant. Do only what this skill says, in its order, and never step outside the system (see System rules in the conventions file).
+
 # ship
 
 Turn a plan into a merged-quality PR. Work only inside the task's worktree. The user's message outranks everything here (see "Your message comes first" in the conventions file).
@@ -19,7 +21,7 @@ Keep the user informed as the Progress board section of the conventions file say
 2. Look for `.scratch/<KEY>-ticket.md`, `-plan.md`, `-decisions.md`, `-repro.md`, `-timeline.md`, the `before/` proof and the worktree.
    - All present: this ran after `blueprint`. Reuse them.
    - Plan missing: read `~/.agents/skills/blueprint/SKILL.md` and run it for this key up to the end of its step 8, then continue here.
-   - Worktree archived: recreate it from the branch with `git worktree add <path> <branch>`.
+   - The task folder `<root>/worktrees/<KEY>/` and its worktrees are what `blueprint` made. Use exactly those. Run `~/.agents/skills/blueprint/scripts/worktree.sh list <root> <KEY>`: it must show a worktree for every repo in the plan's Task folder table. Never create a worktree or a branch of your own. A repo is missing: add it with `~/.agents/skills/blueprint/scripts/worktree.sh add`, install, and run its baseline. The folder was archived: move its worktrees back with the commands in its `archive.md`.
 3. For a bug, open `<KEY>-repro.md`. Its first line must be `Reproduced: yes`, its second line must name the live environment, and `before/` must hold the proof. Otherwise do not build: run `blueprint` for this key, which stops with a could-not-reproduce report when the bug will not reproduce.
 4. Check the plan against the requirement documents and the knowledge file. A plan written before a requirement changed is replanned first.
 5. Recap the plan in about 5 lines, then start building at once.
@@ -34,7 +36,7 @@ Every builder works in the same worktree, so the briefs keep them apart.
 
 1. Read the plan's Subparts table. Order the subparts by dependency into batches. Subparts in one batch own separate files and run in parallel.
 2. Start one builder per subpart, as the Agents section of the conventions file says. Each brief is clear and complete on its own:
-   - the worktree path, the plan path and the decision log path
+   - the worktree path (`<root>/worktrees/<KEY>/<short>`), the plan path and the decision log path
    - the subpart id, what it must do, the files it owns, and the test that must pass
    - the checklist lines it covers
    - the do-not-touch list
@@ -128,6 +130,7 @@ No PR, no Jira comment, no Jira attachment and no ticket move until the before a
 ## Never
 
 - Never skip the requirement documents. Re-check them when the loop is stuck.
+- Never create a worktree or a branch. Work only in the task folder `blueprint` made.
 - Never let a sub-agent commit or push.
 - Never edit outside the plan's files without a written reason.
 - Never run a bigger model without a card.

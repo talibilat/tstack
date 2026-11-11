@@ -5,6 +5,8 @@ description: Watches a pull request through CI and review until it is merged. Fi
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
 
+Be strict and vigilant. Do only what this skill says, in its order, and never step outside the system (see System rules in the conventions file).
+
 # babysit
 
 Stay with a PR until it is merged. Review bots and people both leave useful comments, and both can be wrong, so check each one against the code before you change anything.
@@ -30,7 +32,7 @@ One watcher per PR. Never write a `sleep` loop, a polling loop or `gh --watch`.
 
 ## 3. Fix failed checks
 
-Read only the failing job: `gh run view <id> --log-failed | tail -80`. Tell a real failure from a flaky runner. Fix real ones with the `fix-ci` skill, or by hand without it. Recreate the worktree from the branch if it is gone.
+Read only the failing job: `gh run view <id> --log-failed | tail -80`. Tell a real failure from a flaky runner. Fix real ones with the `fix-ci` skill, or by hand without it. Work in the task folder `<root>/worktrees/<KEY>/<short>`. If it was archived, move it back with the command in its `archive.md`.
 
 ## 4. Answer every comment
 
@@ -62,7 +64,13 @@ The PR is good when CI passed, there are no conflicts, `unresolved_count` is 0 a
 
 - A new comment, a failed check or a conflict: go back to the matching step.
 - Approved but not merged: wait. Never merge the PR yourself, unless the user asked for the merge in clear words and the repo's rules allow it. Right before such a merge, fetch and check that the branch is up to date and green.
-- `state` is MERGED: call `unwatch_pull_request`, post the Jira update, and tell the user.
+- `state` is MERGED: call `unwatch_pull_request`. When every PR of the task is merged, archive the task folder, then post the last Jira update and tell the user:
+
+  ```
+  ~/.agents/skills/blueprint/scripts/worktree.sh archive <root> <KEY> --merged --scratch .scratch
+  ```
+
+  It moves the whole `<root>/worktrees/<KEY>/` folder, every repo worktree inside it, to `<root>/archived-worktrees/<KEY>/`. It copies the task files (ticket, plan, reviews, evidence) into `scratch/` there, and writes `archive.md` with each repo, branch, last commit and the command to move it back. It refuses while a worktree has uncommitted changes: show the list and ask the user. Give the archive path in the final message.
 - `state` is CLOSED without a merge: report it and ask what to do next.
 
 When you stop for any other reason (blocked, or waiting on the user), call `unwatch_pull_request` first, so the chat shows that it needs attention.

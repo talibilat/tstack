@@ -2,6 +2,18 @@
 
 Shared by `blueprint`, `reproduce`, `ship`, `inspect` and `lane`. Read it once per run. `guide` explains the pipeline to a person and says what to do next from any point.
 
+## System rules (strict)
+
+Be strict and vigilant. These apply to every skill, every agent and every sub-agent.
+
+- **Stay inside the system.** Do only what the skills say, in their order. No improvised steps, side tools, shortcuts or "while I am here" work. When a situation is not covered, stop and ask with a card. Do not invent a path.
+- **Never change the system to get past it.** Do not edit a skill, a gate script, the progress board, a verdict or a proof file to make a check pass. Do not run a command only to print PASS. Never fake an output.
+- **Evidence for every Done.** A Done condition is met only when you have pasted the command output or opened the file that shows it. "I believe it passed" is not evidence.
+- **Check where you are.** Before and after each batch of work, run `git status` in each worktree. Work only in the task folder `<root>/worktrees/<KEY>/<short>`, on the task branch, never on `dev` or `main`. Do not edit outside the task folder, the `.scratch` task files and the lane.
+- **Re-read the Never list** of the skill you are in at every stage boundary.
+- **Only the user can waive a rule**, by naming it in the call.
+- **The progress board enforces the order.** `progress.py set` refuses to advance a stage while an earlier stage is not done.
+
 ## The pipeline
 
 | Order | Skill | Job | Ends with |
@@ -160,8 +172,9 @@ The root folder, GitHub org, default branch and the table of install, test, lint
 | What | Where |
 |---|---|
 | Task files | `.scratch/` in this chat's project folder: `<KEY>-ticket.md`, `<KEY>-repro.md`, `<KEY>-history.md`, `<KEY>-research/`, `<KEY>-decisions.md`, `<KEY>-plan.md`, `<KEY>-reviews.md`, `<KEY>-reviews/` for raw reviewer output, `<KEY>-live-test.md`, `<KEY>-evidence/`, `<KEY>-timeline.md`, `<KEY>-progress.json` |
-| Worktree | `<root>/<repo>-worktrees/<KEY>`, made with plain `git worktree add` |
-| Archive | `<root>/archived-worktrees/<KEY>/` |
+| Task folder | `<root>/worktrees/<KEY>/`, one folder per task, made by `blueprint` and used by every later skill |
+| Worktree | `<root>/worktrees/<KEY>/<short>`, one per repo (`fe`, `be`, `ai`, ...), made with `worktree.sh add`, never with a bare `git worktree add`. Short names are in `setup.md` |
+| Archive | `<root>/archived-worktrees/<KEY>/`, made by `babysit` after the PR is merged, with `worktree.sh archive` |
 | Branch | `bugfix/<KEY>-<slug>` for Bugs, `feature/...` for Tasks and Stories, `docs/...` for docs-only, `chore/...` for cleanups |
 | Commit message | `<KEY>: <what changed>` |
 | PR title | `[<KEY>]: <lowercase imperative summary>` |
@@ -196,6 +209,7 @@ One board per task shows how far every stage is. The command is `python3 -I ~/.a
 - `progress.py init <KEY>` once, at the start of `blueprint`.
 - `progress.py set <KEY> <stage> <done> <total> --note "<what just finished>"` whenever a step finishes.
 - `progress.py skip <KEY> <stage> --note "<why>"` for a stage that does not apply.
+- `progress.py catchup <KEY> <stage> --why "<reason>"` when you resume a task mid-way and the files show the earlier stages are really done. It marks them done and records the reason.
 - `progress.py show <KEY>` prints the table. Post it in chat.
 - `progress.py due <KEY>` says "due" when 10 minutes have passed since the last table.
 
@@ -275,6 +289,22 @@ Where it is kept: `.scratch/<KEY>-evidence/` (`before/`, `after/`, `compare/`). 
 
 How the proof is taken: with the app running in Docker (a `lane` for Aruva) and driven in real Google Chrome on this computer, in a visible window, step by step. A background or headless script is allowed only when there is no other option, and the reason goes on the `Method:` line of the repro file.
 
+## Task folder and worktrees
+
+One folder per task, one worktree per repo inside it, all on the same branch name:
+
+```
+<root>/worktrees/ARPP-1234/fe
+<root>/worktrees/ARPP-1234/be
+<root>/worktrees/ARPP-1234/ai
+```
+
+- `blueprint` makes the folder first, and makes it the first thing its plan lists. It adds a worktree for each repo it needs, and when the research shows another repo is needed it adds that one to the same folder.
+- `ship`, `inspect`, `lane`, `proof` and `babysit` work only in that folder. They never create a worktree or a branch of their own.
+- Use `~/.agents/skills/blueprint/scripts/worktree.sh` (called `worktree.sh`): `add <root> <KEY> <short> <repo-path> <branch>`, `list <root> <KEY>`, and `archive <root> <KEY> --merged --scratch .scratch`.
+- A task started before this layout has its worktrees at `<root>/<repo>-worktrees/<KEY>`. Move each into the task folder with `git -C <repo> worktree move <old path> <root>/worktrees/<KEY>/<short>`, once, when the task is next picked up.
+- `babysit` moves the whole task folder to `<root>/archived-worktrees/<KEY>/` once every PR of the task is merged. It refuses while a worktree has uncommitted changes.
+
 ## Evidence
 
 Proof lives in `.scratch/<KEY>-evidence/`:
@@ -325,4 +355,4 @@ Stop and ask before any of these:
 
 ## Never ask
 
-Do these without asking: assign the ticket to me, move it to In Progress or Code Review, log work, post the milestone comments from the Jira updates section, rename the chat, push the ticket branch, open the PR, delete the ticket worktree after archiving it, install a missing proof tool (browser, Playwright, HTTP client, screenshot tool) outside the repo, use the user's computer, terminal and browser to reproduce and test, push the `evidence/<KEY>` branch, attach the before and after screenshots to the ticket, and reply to and resolve the review threads you fixed. Anything else that leaves this Mac asks first.
+Do these without asking: assign the ticket to me, move it to In Progress or Code Review, log work, post the milestone comments from the Jira updates section, rename the chat, push the ticket branch, open the PR, archive the task folder after the PR is merged, install a missing proof tool (browser, Playwright, HTTP client, screenshot tool) outside the repo, use the user's computer, terminal and browser to reproduce and test, push the `evidence/<KEY>` branch, attach the before and after screenshots to the ticket, and reply to and resolve the review threads you fixed. Anything else that leaves this Mac asks first.

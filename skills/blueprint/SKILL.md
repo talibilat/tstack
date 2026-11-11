@@ -5,6 +5,8 @@ description: The first skill of the pipeline. Turns a Jira ticket, the problem a
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
 
+Be strict and vigilant. Do only what this skill says, in its order, and never step outside the system (see System rules in the conventions file).
+
 # blueprint
 
 Understand the task, prove the problem, research it, and write a plan that no builder can misread. Change no code except the failing repro test.
@@ -38,7 +40,7 @@ Do all three checks.
 
 1. Fetch the ticket again. If it has an assignee other than me, or its status means someone finished or is working on it, stop and say so. In the card flow, offer the next ticket.
 2. Search T3 chats for the key with `t3_thread_search` and `t3_thread_list` (`titleContains`). Read each other chat that mentions it. If that chat is working on the ticket, tell the user and stop. If its state is unclear, send one question with `t3_thread_send` ("Are you working on <KEY>? Answer yes or no."), wait up to 5 minutes with `t3_thread_wait`, and count no answer as taken.
-3. Look for earlier work in every repo under the root folder in `setup.md`: branches named for the key, folders under `<root>/*-worktrees` and `<root>/archived-worktrees`, and `gh pr list -R <org>/<repo> --search "<KEY>" --state all`. An open PR or live branch owned by someone else counts as taken. A merged or closed PR, or an archive folder, is earlier work: note it for step 5.
+3. Look for earlier work in every repo under the root folder in `setup.md`: branches named for the key, folders under `<root>/worktrees` and `<root>/archived-worktrees`, and `gh pr list -R <org>/<repo> --search "<KEY>" --state all`. An open PR or live branch owned by someone else counts as taken. A merged or closed PR, or an archive folder, is earlier work: note it for step 5.
 
 Then claim: write `claim` to the timeline, set the assignee to my accountId, move the ticket to "In Progress" by transition name, fetch it again to confirm, and rename the chat to the key and nothing else. If another chat claimed it a moment earlier, back out.
 
@@ -54,14 +56,23 @@ Done when Jira shows me as assignee and In Progress, and the chat carries the ke
 
 Done when the ticket file exists and every requirement you know of has a named source.
 
-## 4. Worktrees and baseline
+## 4. Task folder, worktrees and baseline
+
+Everything for this task lives in one folder, `<root>/worktrees/<KEY>/`, with one worktree per repo inside it (`fe`, `be`, `ai`, and so on, named in `setup.md`). Make it now. It is also the first item of the plan.
 
 1. Choose the repos yourself. Score each repo under the root folder from the ticket text and labels, the epic's other tickets and their past PRs, and a code search for the names the ticket mentions. Ask only when no repo stands out.
-2. For each repo: `git -C <repo> fetch origin <default branch>`, then `git -C <repo> worktree add -b <branch> <root>/<repo>-worktrees/<KEY> origin/<default branch>`. A worktree for this key on an unmerged branch with only my commits is resumed, after `sync-dev.sh` brings it up to date with dev. Ask when the branch holds someone else's commits.
-3. Run the install command from the conventions table inside the worktree (`npm ci`, `uv sync`, never an upgrade).
-4. Run test, lint, typecheck and build. Keep pass or fail, counts and the names of failing tests. Record failures that existed before this change so they are not blamed on it. Leave them unfixed.
+2. For each repo, make its worktree in the task folder (`<root>/worktrees/<KEY>/<short>`):
 
-Done when each repo has a worktree and a baseline row.
+   ```
+   ~/.agents/skills/blueprint/scripts/worktree.sh add <root> <KEY> <short> <repo-path> <branch>
+   ```
+
+   It makes the folder on the first call, branches from the latest `origin/<default branch>`, and resumes a worktree that is already there. After a resume, run `sync-dev.sh` to bring it up to date with dev. Ask when the branch holds someone else's commits. Use the same branch name in every repo. Never create a worktree any other way or anywhere else.
+3. Run the install command from the conventions table inside each worktree (`npm ci`, `uv sync`, never an upgrade).
+4. Run test, lint, typecheck and build in each. Keep pass or fail, counts and the names of failing tests. Record failures that existed before this change so they are not blamed on it. Leave them unfixed.
+5. **If the research or the plan later shows that another repo is needed**, add its worktree to the same folder with `worktree.sh add`, install, run its baseline, and add it to the plan's Task folder table. Do this before the plan is finished. Never move the task to a new folder.
+
+Done when `~/.agents/skills/blueprint/scripts/worktree.sh list <root> <KEY>` shows a clean worktree for every repo, each with a baseline row.
 
 ## 5. Reproduce first (a hard gate)
 
@@ -113,6 +124,7 @@ Done when every question the ticket and the chat raise has an answer with a sour
 
 ## 7. Write the plan and the decision log
 
+0. Make the plan's first section the Task folder and worktrees table (see the template). It lists every worktree that exists and every one still to add.
 1. Write `.scratch/<KEY>-decisions.md` using the layout in `references/plan-template.md`. Every decision gets one row and one backing: a BA quote for what the product must do, code evidence for how it is built. A decision with no backing is not made. It goes under Blockers as a question for the BA.
 2. Write `.scratch/<KEY>-plan.md` using the same template. Cover every point in the ticket, the chat and the user's message. Split the work into subparts that own separate files. Fill in the Live test section from `<KEY>-repro.md`, so `inspect` and `lane` can replay it.
 3. Fill in the plan's Checklist: one line for each thing that was asked, pointing to the subpart that builds it and the check that proves it.
@@ -154,5 +166,6 @@ Then hand off:
 - Never write the plan before the research agents have returned.
 - Never research, decide or plan a bug that has not reproduced. Stop and report why instead.
 - Never skip the before proof. It is skipped only when the user says "skip proof" in the call (see Proof in the conventions file).
+- Never create a worktree or a branch outside `<root>/worktrees/<KEY>/`, or by any way other than `worktree.sh add`.
 - Never push in this skill.
 - Never rename the chat to anything but the ticket key.
