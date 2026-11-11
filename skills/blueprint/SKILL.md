@@ -69,7 +69,7 @@ Run the `reproduce` skill when the task is a bug, or when the ticket or the chat
 
 | Result | What you do |
 |---|---|
-| `Reproduced: yes` | Run the before gate below. Carry on to step 6 only when it passes. |
+| `Reproduced: yes` | Run the before gate below. Carry on to step 6 only when it passes. The gate includes the `proof` before half. |
 | `Reproduced: no` | Stop. See below. |
 | `Reproduced: already fixed` | Stop. See below. The current code no longer shows the bug and the history names the change that fixed it. |
 

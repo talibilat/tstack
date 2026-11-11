@@ -83,6 +83,10 @@ def check_image(path, report):
         from PIL import Image
 
         with Image.open(path) as img:
+            img.load()  # fully decode, so a truncated or corrupt file fails here
+            if img.width < 600 or img.height < 300:
+                report.fail(f"{path.name} is {img.width}x{img.height}, too small to be a real screenshot")
+                return False
             low, high = img.convert("L").getextrema()
             if low == high:
                 report.fail(f"{path.name} is one flat colour (blank screenshot)")
@@ -151,6 +155,8 @@ def gate_before(args):
         report.fail("before/ has no log file (.txt or .log) for the failing action")
     elif result == "yes":
         report.ok(f"{len(logs_in(before))} log file(s) in before/")
+    for problem in load_pair().problems_before(pair_args(args, "before")):
+        report.fail(problem)
     return report.finish("before gate")
 
 
@@ -171,9 +177,9 @@ def gate_after(args):
     before, after = evidence_dir(args) / "before", evidence_dir(args) / "after"
     allowed = set(args.allow_identical or [])
     for shot in images_in(before):
-        twin = after / shot.name
-        if not twin.exists():
-            report.fail(f"after/{shot.name} is missing. Take it with the same steps and the same file name")
+        twin = next((after / (shot.stem + ext) for ext in IMAGE_EXT if (after / (shot.stem + ext)).exists()), None)
+        if twin is None:
+            report.fail(f"after/{shot.stem}.* is missing. Take it with the same steps and the same file name")
             continue
         if not check_image(twin, report):
             continue
@@ -183,59 +189,30 @@ def gate_after(args):
             report.ok(f"after/{shot.name}")
     if not logs_in(after):
         report.fail("after/ has no log file (.txt or .log) for the same action")
+    for problem in load_pair().problems_after(pair_args(args)):
+        report.fail(problem)
     return report.finish("after gate")
 
 
+def load_pair():
+    """Load pair.py from the proof skill, which sits next to this skill."""
+    for base in (Path(__file__), Path(__file__).resolve()):
+        path = base.parents[2] / "proof" / "scripts" / "pair.py"
+        if path.exists():
+            spec = importlib.util.spec_from_file_location("pair", path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            return module
+    sys.exit("the proof skill is not installed next to this one (skills/proof/scripts/pair.py)")
+
+
+def pair_args(args, stage="after"):
+    return argparse.Namespace(key=args.key, dir=args.dir, stage=stage)
+
+
 def compare(args):
-    report = Report()
-    try:
-        from PIL import Image, ImageDraw, ImageFont
-    except ImportError:
-        print("Pillow is missing. Install it outside the repo: python3 -m pip install --user pillow")
-        return 1
-    before, after = evidence_dir(args) / "before", evidence_dir(args) / "after"
-    out = evidence_dir(args) / "compare"
-    out.mkdir(parents=True, exist_ok=True)
-    rows = []
-    try:
-        font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 34)
-    except OSError:
-        font = ImageFont.load_default()
-    for shot in images_in(before):
-        twin = after / shot.name
-        if not twin.exists():
-            report.fail(f"no after image for {shot.name}")
-            continue
-        with Image.open(shot) as b, Image.open(twin) as a:
-            b, a = b.convert("RGB"), a.convert("RGB")
-            width = 900
-            b = b.resize((width, max(1, round(b.height * width / b.width))))
-            a = a.resize((width, max(1, round(a.height * width / a.width))))
-            height = max(b.height, a.height)
-            bar, gap = 60, 20
-            canvas = Image.new("RGB", (width * 2 + gap, height + bar), "white")
-            draw = ImageDraw.Draw(canvas)
-            draw.rectangle([0, 0, width, bar], fill=(200, 40, 40))
-            draw.rectangle([width + gap, 0, width * 2 + gap, bar], fill=(30, 140, 60))
-            draw.text((20, 12), "BEFORE", fill="white", font=font)
-            draw.text((width + gap + 20, 12), "AFTER", fill="white", font=font)
-            canvas.paste(b, (0, bar))
-            canvas.paste(a, (width + gap, bar))
-            target = out / (shot.stem + ".png")
-            canvas.save(target, optimize=True)
-            if target.stat().st_size > 1_000_000:  # keep each image under 1 MB
-                target.unlink()
-                target = out / (shot.stem + ".jpg")
-                canvas.save(target, quality=82, optimize=True)
-        rows.append((shot.name, target.name))
-        report.ok(f"compare/{target.name}")
-    if not rows:
-        report.fail("nothing to compare: before/ has no images")
-    lines = ["| Step | Before | After | Side by side |", "|---|---|---|---|"]
-    for name, joined in rows:
-        lines.append(f"| {Path(name).stem} | `before/{name}` | `after/{name}` | `compare/{joined}` |")
-    (out / "compare.md").write_text("\n".join(lines) + "\n")
-    return report.finish("compare")
+    """Builds the annotated before and after pictures with the proof skill's pair.py."""
+    return load_pair().cmd_render(pair_args(args))
 
 
 def load_jira():

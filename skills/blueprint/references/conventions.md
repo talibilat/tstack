@@ -7,7 +7,7 @@ Shared by `blueprint`, `reproduce`, `ship`, `inspect` and `lane`. Read it once p
 | Order | Skill | Job | Ends with |
 |---|---|---|---|
 | 1 | `blueprint` | Understand the task, claim it, trace the requirements, research with sub-agents, write the plan | A checked plan, a decision log and a checklist |
-| 1a | `reproduce` | Called by `blueprint` for bugs. Replays the bug live and saves the before proof | Repro steps, before screenshots and logs, a failing test |
+| 1a | `reproduce` | Called by `blueprint` for bugs. Replays the bug live and saves the before proof, through `proof before` | Repro steps, before screenshots and logs, a failing test |
 | 2 | `ship` | Build in the worktree with parallel sub-agents, fix what `inspect` finds | Commits that `inspect` passes |
 | 3 | `inspect` | Four code reviewers, a live run and a QA validation, scored out of 100 | A verdict. `ship` and `inspect` loop until both are satisfied |
 | 4 | `lane` | The private running app for every live step: before proof, live run, after proof | Screenshots and logs |
@@ -105,6 +105,7 @@ These skills call other skills. Find one by looking for `<name>/SKILL.md` under 
 | Reviewer: correctness, safety, lean code | `ponytail-review` | Mark the reviewer NOT RUN |
 | Reviewer: strict maintainability | `thermo-nuclear-code-quality-review` | Mark the reviewer NOT RUN |
 | Bug repro and before proof | `reproduce` (same repo) | Do its steps by hand |
+| The annotated before and after picture, and the check against the requirements | `proof` (same repo) | Not optional. Install it |
 | Live run and screenshots for Aruva | `lane` (same repo) | Use the browser tools or a real run |
 | Plan grilling | `grilling` | Write the hard questions yourself |
 | Plan check | `ticket-prework-review`, pstack `blast-radius` | Skip that part and say so |
@@ -264,9 +265,9 @@ The path, with a mechanical check at each point (`python3 -I ~/.agents/skills/bl
 
 | When | What | Check |
 |---|---|---|
-| The bug happens | `reproduce` saves the before screenshots and logs into `before/` | `proof.py gate before <KEY>` prints PASS. Planning cannot start without it |
+| The bug happens | `reproduce` saves the before screenshots and logs into `before/` and calls `proof before`, which builds the left half | `proof.py gate before <KEY>` prints PASS. Planning cannot start without it |
 | The bug is fixed | `ship` saves the after screenshots and logs into `after/`, same steps, same file names | `proof.py gate after <KEY>` prints PASS |
-| After it passes | `proof.py compare <KEY>` joins each pair into one side-by-side image in `compare/` (red BEFORE, green AFTER). Look at each one and retake or crop if it is unclear | The images are readable |
+| The after picture | The `proof` skill (`proof after <KEY>`) fills the right half of each picture, circles and numbers every change, writes what is being looked at and what was asked, and checks each step against the requirements. `NOT COMPLETE` means the work is not finished | `pair.py check` prints COMPLETE. Look at each picture and fix or retake if it is unclear |
 | Before the PR | The comparison images go to the evidence branch and into the PR description | |
 | After the PR opens | `proof.py attach <KEY>` puts the comparison images and logs on the Jira ticket | `proof.py verify <KEY> --pr <org/repo#n>` prints PASS. The ticket cannot move to Code Review before it |
 
@@ -283,7 +284,7 @@ Proof lives in `.scratch/<KEY>-evidence/`:
 | `before/NN-<what>.png` | The problem, or the old screen, one file per step of `<KEY>-repro.md` | `reproduce`, or `blueprint` for a change that is not a bug |
 | `before/*.txt` | Logs, console output and the failed request for the same action | the same |
 | `after/NN-<what>.png` | The same steps on the final commit, under the same file names | `inspect` live run, or `ship` step 5 |
-| `compare/NN-<what>.png` and `compare/compare.md` | One side-by-side image per step, built by `proof.py compare` | `ship` step 5 |
+| `compare/NN-<what>.png` and `compare/compare.md` | The annotated pair per step: before left, after right, changes circled and numbered, caption and verdict. Built by the `proof` skill. The step list is `.scratch/<KEY>-proof.json` | `proof before` (left half), then `proof after` |
 | `after/*.txt` | The same logs, now clean | the same |
 | other `NN-<what>` files | Proof for the other live run steps | `inspect` |
 

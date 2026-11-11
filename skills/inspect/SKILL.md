@@ -85,7 +85,7 @@ Work out the layers the ticket touches (front end, back end, AI, document proces
 
 ### 2.5 Validating a bug fix
 
-1. Replay the steps in `<KEY>-repro.md` and confirm the original defect no longer occurs. Save the after proof with the same file names as the before proof.
+1. Replay the steps in `<KEY>-repro.md` and confirm the original defect no longer occurs. Save the after proof with the same file names as the before proof, by calling the `proof` skill in `after` mode (`proof after <KEY>`). A reply of `Proof: NOT COMPLETE` makes the verdict "Stays open", with the items it lists.
 2. Check that the root cause is fixed, not only the visible symptom.
 3. Check the same mechanism in related places (other screens, endpoints, formats).
 4. Check linked bugs and regressions around the changed code.

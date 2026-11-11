@@ -64,6 +64,30 @@ Before and after are taken the same way: follow `.scratch/<KEY>-repro.md` step b
 - The live test result is valid only for the commit you built. Rebuild and retest after every code change.
 - Lanes share some real outside services with dev: uploads land in the dev cloud storage bucket, AI calls use real model keys and cost money, and mail can really send. Use fixture accounts only and keep AI-heavy flows small (the small handbook PDFs).
 
+## Test books
+
+Need a book or document for a test? Use the files in `~/Documents/Projects/ARUVA/Data` (Nokia, Telecom, Maths, Chemistry, Psychologu, Biology.pdf, AI-Security). Pick the smallest one that works. Biology.pdf is 136 MB, so avoid it.
+
+The ticket may attach the book that shows the bug. Download that same book from Jira and test with it. Keep the download in the scratchpad, never in a repo.
+
+- Use them for testing only. Never attach them to a real course, ticket, PR or Jira comment.
+- Check the lane first. If the book or course already exists there, or the upload would create a duplicate, use a different book or create a new course. Do not reuse or overwrite the existing one.
+- Local Gemini embeddings use the Vertex AI JSON key whose path is in `blueprint/references/setup.md`. Local only. Never commit it or paste its contents.
+
+## The annotated pair
+
+The before and after pictures are built by the `proof` skill: before on the left, after on the right, every change circled and numbered, what is being looked at and what was asked written on the picture, and a verdict against the requirements. `reproduce` calls it in `before` mode (left half only) and `ship` and `inspect` call it in `after` mode. See `proof` for the tool and the prompts.
+
+## Proof gate, no exceptions
+
+No PR, no Jira comment, no Jira attachment and no ticket move until the before and after screenshots exist, are real, and show the fix. "Real" means:
+
+1. Every step has a `before/` and an `after/` screenshot of the live app (UI whenever the bug shows in the UI). Logs, transcripts and text are extra, never a replacement.
+2. `proof.py gate before` and `gate after` both print PASS. The gate fully decodes each image, rejects blank, tiny or corrupt files and files that are not PNG, JPEG or WebP.
+3. Open every image yourself (Read it) and check it shows the right screen, the bug on the before side, and the fixed behavior on the after side. A page that only shows a login, an error page, a blank screen or the wrong course is not proof. Retake it.
+4. After you upload to GitHub or Jira, download or open the uploaded image and check it renders. A broken image link or a corrupted upload counts as not published. Fix it, then re-check.
+5. If you cannot produce the screenshots (lane will not start, key invalid, blocked), stop and tell the user why. Do not open the PR or comment on Jira without them. Only the user can waive this, by saying "skip proof" in the call.
+
 ## When something breaks
 
 `scripts/isolation-check.sh` proves that no lane can reach another lane's services; run it if you suspect cross-talk. `lane repair N` re-attaches the shared services after the base stack was recreated. `references/troubleshooting.md` lists the failures seen while building this skill and the fix for each. Read it before you change `lane` itself.

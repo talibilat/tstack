@@ -70,7 +70,7 @@ Nothing moves forward until the bug reproduces. Do not stop at the first failure
 |---|---|
 | Docker or the lane will not start | Start Docker (`open -a Docker`), free memory, run `lane doctor`, follow `lane/references/troubleshooting.md`, start again |
 | The local copy is behind dev or on the wrong commit | Run `sync-dev.sh`, rebuild, and check out the commit the report names |
-| Missing data, account or file | Create it in the live copy with the shape the report names (fixture accounts are in `lane/references/accounts.md`, and a small sample file) |
+| Missing data, account or file | Create it in the live copy with the shape the report names (fixture accounts are in `lane/references/accounts.md`). For a book, first download the one attached to the Jira ticket, otherwise use the smallest file in `~/Documents/Projects/ARUVA/Data` (Nokia, Telecom, Maths and others), for testing only. If that book or course already exists in the lane, use another book or create a new course. See the Test books section in `lane` |
 | The environment differs (a setting, a feature flag, a service key) | Read the settings of the environment where it was seen, copy the relevant one into the lane, or reproduce on the deployed dev environment when the report was made there |
 | The steps are missing or unclear | Read every comment, attachment and video on the ticket and its parents again, search similar tickets, and try each reasonable reading of the steps |
 | It happens only sometimes (timing, load, order) | Repeat the steps 10 times, change the order, double-click, slow the network, and read the backend log of the failing request |
@@ -103,6 +103,10 @@ Save into `.scratch/<KEY>-evidence/before/`, using the file names from `<KEY>-re
 
 Save each screenshot at the moment the bug shows. Never overwrite `before/` later, because the after proof is compared against it. It lives in `.scratch/<KEY>-evidence/before/`, and stays there until the PR is merged and is then archived.
 
+Then call the `proof` skill in `before` mode. It captures the UI first (terminal output only for a step with no UI), writes what is being looked at and what was asked for each step, and builds the picture with the before on the left and the after still empty. Pass it:
+
+> `proof before <KEY>. Steps are in .scratch/<KEY>-repro.md. Live environment: <lane or URL>. Method: visible Chrome. Capture the UI first, and terminal output only for a step with no UI. Fill the left half only.`
+
 Strip tokens, secrets and personal data. Close every browser window and tab you opened, and give the lane back with `lane down N`. Then run the before gate:
 
 ```
@@ -111,7 +115,7 @@ python3 -I ~/.agents/skills/blueprint/scripts/proof.py gate before <KEY>
 
 It checks the result, the live environment and method lines, that every step has a real screenshot, and that the logs exist. Paste its last line in chat.
 
-Done when the gate prints `before gate: PASS`, and no window or lane is left open.
+Done when the gate prints `before gate: PASS` (it includes the `proof` before check), and no window or lane is left open.
 
 ## 6. Turn it into a failing test
 
@@ -124,6 +128,20 @@ Done when the test or script goes red on the bug.
 Use the `diagnosing-bugs` skill to find the cause. Add to `<KEY>-repro.md`: the root cause with `file:line`, the failing test path, and for a repeat bug the verdict from step 2.
 
 Set the first line of `<KEY>-repro.md` to `Reproduced: yes`. Reply to the caller with: `Reproduced: yes`, the root cause in 2 lines, the proof folder, and "This is a repeat of <old key>" when it is one. `blueprint` then fills the plan's Reproduction, Previous attempt and Why it came back sections from these files.
+
+## The annotated pair
+
+The before and after pictures are built by the `proof` skill: before on the left, after on the right, every change circled and numbered, what is being looked at and what was asked written on the picture, and a verdict against the requirements. `reproduce` calls it in `before` mode (left half only) and `ship` and `inspect` call it in `after` mode. See `proof` for the tool and the prompts.
+
+## Proof gate, no exceptions
+
+No PR, no Jira comment, no Jira attachment and no ticket move until the before and after screenshots exist, are real, and show the fix. "Real" means:
+
+1. Every step has a `before/` and an `after/` screenshot of the live app (UI whenever the bug shows in the UI). Logs, transcripts and text are extra, never a replacement.
+2. `proof.py gate before` and `gate after` both print PASS. The gate fully decodes each image, rejects blank, tiny or corrupt files and files that are not PNG, JPEG or WebP.
+3. Open every image yourself (Read it) and check it shows the right screen, the bug on the before side, and the fixed behavior on the after side. A page that only shows a login, an error page, a blank screen or the wrong course is not proof. Retake it.
+4. After you upload to GitHub or Jira, download or open the uploaded image and check it renders. A broken image link or a corrupted upload counts as not published. Fix it, then re-check.
+5. If you cannot produce the screenshots (lane will not start, key invalid, blocked), stop and tell the user why. Do not open the PR or comment on Jira without them. Only the user can waive this, by saying "skip proof" in the call.
 
 ## Never
 

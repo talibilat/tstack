@@ -1,6 +1,6 @@
 ---
 name: guide
-description: The guide to the tstack skills (full-send, blueprint, reproduce, ship, inspect, lane, babysit, council, modernize, explain-jira, explain-pr, unslop). Says when and how to use each one, and from the middle of any chat says where the work stands and what to do next. Also lists every skill installed on this machine. Use when the user types guide, asks what to do next, which skill fits, how a skill works, or which skills exist.
+description: The guide to the tstack skills (full-send, blueprint, reproduce, proof, ship, inspect, lane, babysit, council, modernize, explain-jira, explain-pr, unslop). Says when and how to use each one, and from the middle of any chat says where the work stands and what to do next. Also lists every skill installed on this machine. Use when the user types guide, asks what to do next, which skill fits, how a skill works, or which skills exist.
 ---
 
 Never assume a requirement. Check Jira for the latest requirements before acting. If a requirement is unclear or cannot be verified, ask the user in plain language before proceeding with work that depends on it.
@@ -31,6 +31,7 @@ Pick the branch that fits what the user asked. A bare `guide` in a chat with wor
 | PR open | The PR watch | `babysit <PR link>`, or "check the PR" |
 | An old PR that fell behind | Needs a decision | `modernize <PR link>` |
 | Comments you do not follow | Needs explaining | `explain-jira <Jira link>` or `explain-pr <PR link>` |
+| `pair.py` says NOT COMPLETE | The after picture does not match what was asked, so the work is not finished | `ship KEY` fixes the items it lists and tries again |
 | `proof.py` prints FAIL | A proof gate is stopping the work on purpose | Fix the line it names. Never skip it. Only you can, by saying "skip proof" |
 | A card or question waiting | Blocked on the user | Answer the question shown |
 
@@ -45,6 +46,7 @@ Show this table, then one line on how the stages follow each other. The order an
 | `full-send` | You want the whole job done while you are away | `full send PROJ-123`, or `full send` under a problem in the chat | Every stage below in order, with no questions, and the chat stays on the PR until it is merged |
 | `blueprint` | Always first. A new ticket, a bug, an error in the chat, or any request | `blueprint` alone in an empty chat asks 1 to 4 short questions (random or specific ticket, then priority, epic, ticket). `blueprint PROJ-123` asks nothing. `blueprint` under a problem in the chat plans that problem. `just blueprint` stops after the plan | A claimed ticket, a worktree, before proof, research from many sub-agents, a decision log backed by BA words, a checked plan with a checklist |
 | `reproduce` | `blueprint` calls it for every bug. Type it yourself to reproduce a bug or check one that came back | `reproduce PROJ-123` | Step by step repro on the current code, before screenshots and logs, a failing test, the root cause, and the history when it is a repeat. When it will not reproduce, a short report of why and how to get unblocked, and no plan |
+| `proof` | A bug needs a before and after picture. `reproduce` calls it for the left half, `ship` and `inspect` for the right half. Type it to check one yourself | `proof before KEY` or `proof after KEY` | One annotated picture per step: before left, after right, changes circled and numbered, what was asked written on it, and COMPLETE or NOT COMPLETE |
 | `ship` | After the plan. `blueprint` starts it by itself | `ship PROJ-123`. With no plan it runs `blueprint` first. adding "build only" builds without QA or a PR | Parallel builders in one worktree, the `inspect` loop until the score is 100, after proof, a PR and a Jira comment with before and after screenshots, then the PR watch until merge |
 | `inspect` | `ship` calls it after the build. Type it yourself to check any ticket, branch or PR | `inspect PROJ-123` | Four code reviewers, a live run, every acceptance criterion checked, a score out of 100 and a verdict |
 | `lane` | Whenever the app must run for real: before proof, live run, after proof. The other skills call it | `lane`, or let the pipeline call it | A private copy of Aruva per agent, UI screenshots, API transcripts and logs |

@@ -84,33 +84,46 @@ Done when all four conditions hold on one commit.
 
 ## 5. After proof, and the comparison
 
-Run this on the final commit, after the loop ends. The before proof from `reproduce` is the other half of the comparison, so keep it untouched.
+Run this on the final commit, after the loop ends. The before half from `reproduce` is already on the left of each picture, so keep `before/` untouched.
 
 1. Sync every repo with dev (`~/.agents/skills/lane/scripts/sync-dev.sh <worktree> ...`). If a worktree moved, rebuild the lane and run the baseline again.
-2. Follow `<KEY>-repro.md` exactly as `reproduce` did: same place, same account and data, same method (visible Chrome on the lane, as the `Method:` line says). For Aruva use the `lane` skill.
-3. Save a proof file for every step into `.scratch/<KEY>-evidence/after/`, with the same file names as in `before/`, and the logs for the same action, now clean.
+2. Call the `proof` skill in `after` mode. It captures the same steps in the same place, with the same account, data and method, fills the right half, circles and numbers every change, writes what is being looked at and what was asked, and checks each step against the requirements. Pass it:
+
+   > `proof after <KEY>. Same steps, same place, same account and data. Requirements: .scratch/<KEY>-plan.md checklist and .scratch/<KEY>-decisions.md. Fill the right half, circle and number every change, judge each step against what was asked, and reply COMPLETE or NOT COMPLETE with the items.`
+
+3. Read its reply.
+   - `Proof: COMPLETE`: go on.
+   - `Proof: NOT COMPLETE`: the work is not finished. Treat it as a failed round. Write the phase 2 plan from the items it lists (a step that does not match is a High finding), fix the code, run steps 2 and 3 of this skill again, then call `proof after` again. Never edit a verdict to get past it.
 4. Close every window and tab you opened, and give the lane back.
-5. Run the after gate. It also re-checks the before side, and rejects an after image that is identical to its before image:
+5. Run the after gate. It re-checks the before side, rejects an after image identical to its before image, and runs the `proof` check:
 
    ```
    python3 -I ~/.agents/skills/blueprint/scripts/proof.py gate after <KEY>
    ```
 
-6. Build the comparison. It makes one image per step, with the before and after side by side under red BEFORE and green AFTER labels, and a `compare/compare.md` table:
+6. Open every picture in `compare/` and look at it: the circles sit on the real changes, the labels are readable, and the left and right show the same screen. `python3 -I ~/.agents/skills/blueprint/scripts/proof.py compare <KEY>` rebuilds them.
 
-   ```
-   python3 -I ~/.agents/skills/blueprint/scripts/proof.py compare <KEY>
-   ```
+The after shots `inspect` saved during its live run count, when they were taken on this same commit and cover every step. `proof` still builds and checks the pictures.
 
-7. Open each comparison image and look at it. Check that it shows the same screen, that the bug is visible on the left and gone on the right, and that it is readable. If not, retake the screenshot, or crop the originals (keep the uncropped ones under `originals/`) and run `compare` again.
-
-The after shots `inspect` saved during its live run count, when they were taken on this same commit and cover every step.
-
-Done when `gate after` prints `after gate: PASS` and every comparison image has been looked at.
+Done when `gate after` prints `after gate: PASS` and every picture has been looked at.
 
 ## 6. Close out
 
 Follow `references/closeout.md`. It ends only when the PR is merged. In order: publish the proof, push, open the PR with the before and after table, comment in Jira with the same proof and attach the screenshots, archive and delete the worktree, hand the PR to `babysit` (fix CI, resolve every comment), move the ticket to Code Review and log work, then stay until it merges. Keep Jira current at each milestone.
+
+## The annotated pair
+
+The before and after pictures are built by the `proof` skill: before on the left, after on the right, every change circled and numbered, what is being looked at and what was asked written on the picture, and a verdict against the requirements. `reproduce` calls it in `before` mode (left half only) and `ship` and `inspect` call it in `after` mode. See `proof` for the tool and the prompts.
+
+## Proof gate, no exceptions
+
+No PR, no Jira comment, no Jira attachment and no ticket move until the before and after screenshots exist, are real, and show the fix. "Real" means:
+
+1. Every step has a `before/` and an `after/` screenshot of the live app (UI whenever the bug shows in the UI). Logs, transcripts and text are extra, never a replacement.
+2. `proof.py gate before` and `gate after` both print PASS. The gate fully decodes each image, rejects blank, tiny or corrupt files and files that are not PNG, JPEG or WebP.
+3. Open every image yourself (Read it) and check it shows the right screen, the bug on the before side, and the fixed behavior on the after side. A page that only shows a login, an error page, a blank screen or the wrong course is not proof. Retake it.
+4. After you upload to GitHub or Jira, download or open the uploaded image and check it renders. A broken image link or a corrupted upload counts as not published. Fix it, then re-check.
+5. If you cannot produce the screenshots (lane will not start, key invalid, blocked), stop and tell the user why. Do not open the PR or comment on Jira without them. Only the user can waive this, by saying "skip proof" in the call.
 
 ## Never
 

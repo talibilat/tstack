@@ -15,6 +15,7 @@ The idea and the layout of this repo come from
 | `full-send` | "full send PROJ-123" | Does everything below in one go with nobody watching, and stays on the PR until it is merged. |
 | `blueprint` | "blueprint" | Picks or takes a ticket, reproduces the bug, researches with many sub-agents, and writes a checked plan. Then explains in simple words what is wrong, why, and how it will be fixed. |
 | `reproduce` | (automatic) | Replays a bug step by step, saves the before screenshots and logs, writes a failing test and names the cause. No plan is made until the bug reproduces. If it will not, it says briefly why and how to get unblocked. |
+| `proof` | "proof" | Builds one annotated before and after picture per step: before on the left, after on the right, every change circled and numbered, what was asked written on it. Says NOT COMPLETE when the fix does not match the requirements. |
 | `ship` | "ship" | Builds the plan with parallel sub-agents in one worktree, loops with `inspect` until it passes, opens the PR and updates Jira. |
 | `inspect` | "inspect" | Four code reviewers, a live run and a senior QA check of every acceptance criterion. Scores out of 100. |
 | `lane` | "lane" | A private running copy of the app per agent, for screenshots, API calls and logs. Aruva-specific. |
@@ -36,16 +37,19 @@ The pipeline, in order. `full-send` runs the whole chain.
 ```mermaid
 flowchart LR
   P[blueprint<br>plan] --> R[reproduce<br>before proof] --> P
+  R --> F1[proof<br>before half]
   P --> S[ship<br>build]
   S --> Q[inspect<br>4 reviewers + live QA]
   Q -- findings --> S
   Q -- score 100 --> L[lane<br>after proof]
-  L --> C[ship close-out<br>PR + Jira]
+  L --> F2[proof<br>after half + check]
+  F2 -- NOT COMPLETE --> S
+  F2 --> C[ship close-out<br>PR + Jira]
   C --> B[babysit<br>until merged]
 ```
 
 - `blueprint` uses `reproduce`, `ticket-prework-review` and `lane`.
-- `ship` uses `inspect`, `lane` and `babysit`.
+- `reproduce` and `ship` use `proof`. `proof` uses `lane`.
 - `inspect` uses `postwork` and `lane`.
 - Everything uses `unslop`.
 
@@ -58,6 +62,7 @@ flowchart LR
   subgraph Skills
     blueprint
     br[reproduce]
+    proof
     ship
     inspect
     lane
@@ -82,6 +87,8 @@ flowchart LR
   br -.-> G
   br -->|failing test, local only| C
   br -->|run, screenshot| A
+  proof -->|capture, circle changes, judge| A
+  proof -.->|read plan and requirements| C
   ship -->|comment, screenshots, status, worklog| J
   ship -->|push branch, open PR| G
   ship -->|build and commit| C
@@ -105,6 +112,7 @@ flowchart LR
 |---|---|---|---|---|---|
 | `blueprint` | Assigns the ticket to you, moves it to In Progress, posts the plan comment | Reads PRs | Makes the worktree, commits one failing test locally | Through `reproduce` and `lane` | Push, or change product code |
 | `reproduce` | Reads tickets, links a repeat bug to the old one | Reads PRs and history | Commits a failing test locally | Runs it, takes before screenshots and logs | Push |
+| `proof` | Nothing | Nothing | Reads the plan and the diff | Drives a visible Chrome, takes the before and after pictures | Edit code, mark a step as matching without evidence |
 | `ship` | Comments, uploads screenshots, moves to Code Review, logs time | Pushes the branch and the proof, opens the PR | Builds and commits inside the worktree | Through `inspect` and `lane` | Merge, force-push, touch production |
 | `inspect` | Reads. Drafts bugs, files them only with your yes | Reads the diff | Reads only | Runs every scenario live | Edit code |
 | `lane` | Nothing | Nothing | Reads the worktree to build from | Starts and deletes its own private copy | Touch another agent's copy or the shared stack |
@@ -122,7 +130,7 @@ Every skill stops and asks before these: a force-push or history rewrite, a data
 - Requirements come only from words the BA wrote in Jira. Every decision is logged with its source.
 - Nothing passes without a live run. UI changes are proven with UI screenshots.
 - A bug is reproduced first, in Docker or a lane, in a visible Chrome window. If it will not reproduce, the agent works on the blocker for up to 3 rounds, then reports it and stops. No plan is made.
-- The before and after proof is mandatory. A script checks it at each stage, joins each pair into one side-by-side image, and checks the images are on the Jira ticket and in every PR. Only you can skip it, by saying "skip proof".
+- The before and after proof is mandatory. A script checks it at each stage, builds one annotated before and after picture per step (changes circled and numbered, what was asked written on it), and checks the images are on the Jira ticket and in every PR. Only you can skip it, by saying "skip proof".
 - You get updates in simple words: a progress table, what was just fixed and why, and what is being fixed now. Every 10 minutes by day, every hour in the evening, none overnight.
 - The chat is named after the ticket: `PROJ-123` for the pipeline, `JC PROJ-123` for Jira comments, `GC PROJ-123 #45` for GitHub comments.
 

@@ -8,6 +8,9 @@ Each step below is on the conventions file's "Never ask" list, so none of them n
 
 ## 0. Publish the evidence
 
+Stop here unless every `compare/` image was opened and looked at (not just gated), shows the bug before and the fix after, and is a valid image. After each upload to GitHub or Jira, open the uploaded image and confirm it renders. Never open the PR or comment on Jira first. See the Proof gate in `ship`. The PR table and the Jira comment use the annotated pair from the `proof` skill: before left, after right, every change circled and numbered, a caption with what is being looked at and what was asked, and a verdict. A `proof` result of NOT COMPLETE stops the close out.
+
+
 Evidence is in `.scratch/<KEY>-evidence/`: `before/`, `after/` under the same file names, `compare/` with the side-by-side images, and the logs. Run `python3 -I ~/.agents/skills/blueprint/scripts/proof.py gate after <KEY>` again on the final commit. If it does not print PASS, go back to step 5 of the skill. Never open a PR without the comparison.
 
 Publish the images on an evidence branch. It shares no history with the code, so it can never be merged by accident.
